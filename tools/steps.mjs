@@ -10,6 +10,7 @@ export const groups = {
       ["test", "-p", "limpador-app", "--features", "sandbox"],
     ],
     ["interface (vitest)", "pnpm", ["--filter", "ui", "test"]],
+    ["e2e da interface (playwright)", "pnpm", ["--filter", "ui", "e2e"]],
     ["ferramentas (vitest)", "pnpm", ["--filter", "tools", "test"]],
   ],
   check: [

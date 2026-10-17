@@ -5,11 +5,12 @@
 
 pub mod collector;
 pub mod config;
+pub mod glob;
 pub mod item;
 pub mod message;
 pub mod ports;
 pub mod risk;
-
+pub mod roots;
 /// Version of the core library.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")

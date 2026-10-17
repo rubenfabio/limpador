@@ -14,6 +14,7 @@ export const groups = {
     ["auxiliares do e2e do app (vitest)", "pnpm", ["--filter", "e2e-app", "test"]],
     ["e2e do app real (webdriver)", "pnpm", ["--filter", "e2e-app", "e2e"]],
     ["ferramentas (vitest)", "pnpm", ["--filter", "tools", "test"]],
+    ["rastreabilidade CA → teste", "node", ["tools/traceability.mjs"]],
   ],
   check: [
     ["formatação Rust", "cargo", ["fmt", "--all", "--check"]],

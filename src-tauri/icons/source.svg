@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Limpador</title>
+  <rect width="512" height="512" rx="112" fill="#0f766e"/>
+  <rect x="236" y="72" width="40" height="220" rx="20" fill="#f8fafc" transform="rotate(20 256 182)"/>
+  <path d="M150 300 h212 l36 140 h-284 z" fill="#facc15"/>
+  <path d="M190 330 l-12 92 M256 330 v92 M322 330 l12 92" stroke="#a16207" stroke-width="14" stroke-linecap="round"/>
+</svg>

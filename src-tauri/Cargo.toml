@@ -1,0 +1,22 @@
+[package]
+name = "limpador-app"
+description = "App desktop do Limpador (casca Tauri em volta do núcleo)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+default-run = "limpador-app"
+
+[lib]
+name = "limpador_app_lib"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+limpador-core = { path = "../crates/core" }
+tauri = { version = "2", features = [] }
+
+[lints]
+workspace = true

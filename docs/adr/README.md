@@ -29,6 +29,7 @@ Cada arquivo registra **uma** decisão: o contexto, o que foi decidido, as alter
 | [0013](0013-windows-primeiro.md) | Windows primeiro, com diferenças de plataforma isoladas | Aceita | 2026-10-16 |
 | [0014](0014-textos-por-chave-de-traducao.md) | Textos por chave de tradução, inclusive os do núcleo | Aceita | 2026-10-16 |
 | [0015](0015-agentes-via-cli-e-mcp-com-aprovacao.md) | Agentes via CLI e MCP, com pedidos de aprovação | Aceita (Fase 2) | 2026-10-16 |
+| [0016](0016-estrutura-do-repositorio-e-ferramentas.md) | Estrutura do repositório e ferramentas (pnpm, Biome, comandos únicos) | Aceita | 2026-10-17 |
 
 ## Decisões em aberto (viram ADR quando a tarefa chegar)
 

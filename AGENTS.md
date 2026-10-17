@@ -48,6 +48,18 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 - **Catálogo de locais** declarativo, sem caminhos de terceiros fixos no código ([ADR-0005](docs/adr/0005-catalogo-de-locais-orientado-a-dados.md)).
 - **Persistência apenas local**; o formato ainda será decidido ([ADR-0010](docs/adr/0010-persistencia-local.md)).
 - **Textos por chave de tradução**, inclusive os motivos gerados pelo núcleo ([ADR-0014](docs/adr/0014-textos-por-chave-de-traducao.md)).
+- **Estrutura e ferramentas**: `crates/core` (núcleo), `src-tauri` (casca), `ui/` (interface), `tools/` (verificações); pnpm, Biome, rustfmt e clippy ([ADR-0016](docs/adr/0016-estrutura-do-repositorio-e-ferramentas.md)).
+
+## Comandos
+
+| Comando | O que faz |
+|---|---|
+| `pnpm install` | Instala as dependências JS |
+| `pnpm test` | Todos os testes: núcleo e app (cargo), interface e ferramentas (Vitest) |
+| `pnpm check` | Formatação, lint (clippy, Biome) e tipos |
+| `pnpm fmt` | Formata Rust e TS |
+| `pnpm dev` | Abre o app em modo de desenvolvimento |
+| `pnpm build` | Gera o instalador |
 
 ## Invariantes de segurança (inegociáveis)
 

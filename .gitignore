@@ -1,0 +1,20 @@
+# Rust
+/target/
+/src-tauri/gen/schemas/
+
+# Node
+node_modules/
+/ui/dist/
+*.tsbuildinfo
+
+# Relatórios de teste
+/reports/
+/mutants.out*/
+coverage/
+
+# Sistema e editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,21 @@
+{
+  "name": "limpador",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.16.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node tools/run.mjs test",
+    "check": "node tools/run.mjs check",
+    "fmt": "cargo fmt --all && biome format --write .",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@tauri-apps/cli": "^2.12.3"
+  }
+}

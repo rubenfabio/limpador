@@ -94,4 +94,4 @@ O projeto ainda está no início. Para quem quiser acompanhar ou contribuir:
 
 ## Licença
 
-A definir.
+[MIT](LICENSE)

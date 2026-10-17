@@ -80,7 +80,12 @@ impl GitRepo {
         let seconds = at.duration_since(UNIX_EPOCH).map_err(io::Error::other)?;
         let date = format!("@{} +0000", seconds.as_secs());
         // Identity, hooks and signing come from the isolated config written by FakeMachine.
-        let output = Command::new("git")
+        let mut command = Command::new("git");
+        // Git exports repository locations to hooks; tests run from hooks must not use them.
+        for var in limpador_core::ports::GIT_LOCATION_VARS {
+            command.env_remove(var);
+        }
+        let output = command
             .args(args)
             .current_dir(&self.path)
             .env("GIT_CONFIG_NOSYSTEM", "1")

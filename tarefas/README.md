@@ -40,7 +40,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 | T-01.03 | [Ganho seguro e ranking](F01-motor-de-analise/T-01.03-ganho-seguro-e-ranking.md) | T-01.02, T-01.06 | pendente |
 | T-01.04 | [Contrato de coletor e registro](F01-motor-de-analise/T-01.04-contrato-de-coletor.md) | T-01.01, T-01.02 | concluída |
 | T-01.05 | [Orquestração da análise](F01-motor-de-analise/T-01.05-orquestracao-da-analise.md) | T-01.03, T-01.04 | pendente |
-| T-01.06 | [Atividade de projeto e associação](F01-motor-de-analise/T-01.06-atividade-de-projeto.md) | T-01.01, T-02.03 | pendente |
+| T-01.06 | [Atividade de projeto e associação](F01-motor-de-analise/T-01.06-atividade-de-projeto.md) | T-01.01, T-02.03 | concluída |
 
 ## F02 — Configuração e descoberta
 
@@ -48,7 +48,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 |---|---|---|---|
 | T-02.01 | [Primeira execução](F02-configuracao-e-descoberta/T-02.01-primeira-execucao.md) | T-02.05, T-02.03 | pendente |
 | T-02.02 | [Pastas raiz e exclusões](F02-configuracao-e-descoberta/T-02.02-pastas-raiz-e-exclusoes.md) | T-02.05 | concluída |
-| T-02.03 | [Identificação de projetos](F02-configuracao-e-descoberta/T-02.03-identificacao-de-projetos.md) | T-02.02 | pendente |
+| T-02.03 | [Identificação de projetos](F02-configuracao-e-descoberta/T-02.03-identificacao-de-projetos.md) | T-02.02 | concluída |
 | T-02.04 | [Proteções](F02-configuracao-e-descoberta/T-02.04-protecoes.md) | T-02.03 | pendente |
 | T-02.05 | [Preferências e limiares](F02-configuracao-e-descoberta/T-02.05-preferencias-e-limiares.md) | — | concluída |
 

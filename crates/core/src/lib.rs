@@ -4,6 +4,7 @@
 //! the CLI and the MCP server are thin shells around it.
 
 pub mod collector;
+pub mod config;
 pub mod item;
 pub mod message;
 pub mod ports;

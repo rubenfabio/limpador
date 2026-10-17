@@ -8,9 +8,12 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+toml = "1.1.8"
 
 [lints]
 workspace = true
 
 [dev-dependencies]
 limpador-testkit = { path = "../testkit" }
+tempfile = "3.27.0"

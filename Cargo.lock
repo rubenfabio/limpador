@@ -1660,6 +1660,9 @@ name = "limpador-core"
 version = "0.1.0"
 dependencies = [
  "limpador-testkit",
+ "serde",
+ "tempfile",
+ "toml 1.1.8+spec-1.1.0",
 ]
 
 [[package]]

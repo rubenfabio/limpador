@@ -1,0 +1,16 @@
+[package]
+name = "limpador-testkit"
+description = "Máquina falsa para testes: gerador de cenários e dublês (ADR-0012). Nunca usar em produção."
+publish = false
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+limpador-core = { path = "../core" }
+tempfile = "3"
+
+[lints]
+workspace = true

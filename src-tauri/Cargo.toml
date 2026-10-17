@@ -11,6 +11,10 @@ default-run = "limpador-app"
 [lib]
 name = "limpador_app_lib"
 
+[features]
+# Accepts LIMPADOR_SANDBOX (fake machine) — only for e2e test builds, never for releases.
+sandbox = []
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 

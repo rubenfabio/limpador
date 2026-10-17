@@ -4,6 +4,11 @@
 export const groups = {
   test: [
     ["core e app (cargo test)", "cargo", ["test", "--workspace"]],
+    [
+      "app em modo sandbox (cargo test)",
+      "cargo",
+      ["test", "-p", "limpador-app", "--features", "sandbox"],
+    ],
     ["interface (vitest)", "pnpm", ["--filter", "ui", "test"]],
     ["ferramentas (vitest)", "pnpm", ["--filter", "tools", "test"]],
   ],
@@ -12,7 +17,7 @@ export const groups = {
     [
       "lint Rust (clippy)",
       "cargo",
-      ["clippy", "--workspace", "--all-targets", "--", "-D", "warnings"],
+      ["clippy", "--workspace", "--all-targets", "--all-features", "--", "-D", "warnings"],
     ],
     ["lint e formatação TS (biome)", "pnpm", ["exec", "biome", "ci", "."]],
     ["tipos TS", "pnpm", ["--filter", "ui", "typecheck"]],

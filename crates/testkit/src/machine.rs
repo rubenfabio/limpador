@@ -1,5 +1,6 @@
 use crate::clock::FixedClock;
 use crate::git::{GitRepo, SquashMergedBranch};
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File};
 use std::io;
 use std::path::{Path, PathBuf};
@@ -250,7 +251,51 @@ impl FakeMachine {
     fn git_config_home(&self) -> PathBuf {
         self.path(".git-config")
     }
+
+    /// Every file and folder of the machine, with size and modification time.
+    pub fn snapshot(&self) -> MachineSnapshot {
+        let mut entries = BTreeMap::new();
+        let mut pending = vec![self.root().to_owned()];
+        while let Some(dir) = pending.pop() {
+            for entry in fs::read_dir(&dir).expect("readable fake machine") {
+                let entry = entry.expect("readable entry");
+                let meta = fs::symlink_metadata(entry.path()).expect("metadata");
+                let relative = entry.path().strip_prefix(self.root()).unwrap().to_owned();
+                if meta.is_dir() {
+                    pending.push(entry.path());
+                    entries.insert(relative, None);
+                } else {
+                    entries.insert(relative, Some((meta.len(), meta.modified().ok())));
+                }
+            }
+        }
+        MachineSnapshot(entries)
+    }
+
+    /// Guard for "analysis never changes anything" (I1): panics listing every path that
+    /// was created, removed or modified since `before`.
+    pub fn assert_unchanged_since(&self, before: &MachineSnapshot) {
+        let after = self.snapshot();
+        let changed: Vec<String> = before
+            .0
+            .keys()
+            .chain(after.0.keys())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .filter(|path| before.0.get(*path) != after.0.get(*path))
+            .map(|path| path.display().to_string())
+            .collect();
+        assert!(
+            changed.is_empty(),
+            "a máquina falsa foi alterada: {}",
+            changed.join(", ")
+        );
+    }
 }
+
+/// Picture of the fake machine: relative path → (size, mtime) for files, `None` for folders.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MachineSnapshot(BTreeMap<PathBuf, Option<(u64, Option<SystemTime>)>>);
 
 fn set_modified(path: &Path, modified: SystemTime) -> io::Result<()> {
     File::options()

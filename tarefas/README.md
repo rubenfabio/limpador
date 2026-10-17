@@ -38,7 +38,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 | T-01.01 | [Modelo de item limpável](F01-motor-de-analise/T-01.01-modelo-de-item.md) | — | concluída |
 | T-01.02 | [Classificação de risco e destino](F01-motor-de-analise/T-01.02-classificacao-de-risco.md) | T-01.01 | concluída |
 | T-01.03 | [Ganho seguro e ranking](F01-motor-de-analise/T-01.03-ganho-seguro-e-ranking.md) | T-01.02, T-01.06 | pendente |
-| T-01.04 | [Contrato de coletor e registro](F01-motor-de-analise/T-01.04-contrato-de-coletor.md) | T-01.01, T-01.02 | pendente |
+| T-01.04 | [Contrato de coletor e registro](F01-motor-de-analise/T-01.04-contrato-de-coletor.md) | T-01.01, T-01.02 | concluída |
 | T-01.05 | [Orquestração da análise](F01-motor-de-analise/T-01.05-orquestracao-da-analise.md) | T-01.03, T-01.04 | pendente |
 | T-01.06 | [Atividade de projeto e associação](F01-motor-de-analise/T-01.06-atividade-de-projeto.md) | T-01.01, T-02.03 | pendente |
 

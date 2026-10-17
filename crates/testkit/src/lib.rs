@@ -14,5 +14,5 @@ mod windows;
 pub use clock::FixedClock;
 pub use docker::{FakeDocker, FakeImage};
 pub use git::{GitRepo, SquashMergedBranch};
-pub use machine::{FakeMachine, ProjectKind, ProjectSpec};
+pub use machine::{FakeMachine, MachineSnapshot, ProjectKind, ProjectSpec};
 pub use windows::{LockedFile, create_junction};

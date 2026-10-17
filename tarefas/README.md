@@ -49,7 +49,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 | T-02.01 | [Primeira execução](F02-configuracao-e-descoberta/T-02.01-primeira-execucao.md) | T-02.05, T-02.03 | pendente |
 | T-02.02 | [Pastas raiz e exclusões](F02-configuracao-e-descoberta/T-02.02-pastas-raiz-e-exclusoes.md) | T-02.05 | concluída |
 | T-02.03 | [Identificação de projetos](F02-configuracao-e-descoberta/T-02.03-identificacao-de-projetos.md) | T-02.02 | concluída |
-| T-02.04 | [Proteções](F02-configuracao-e-descoberta/T-02.04-protecoes.md) | T-02.03 | pendente |
+| T-02.04 | [Proteções](F02-configuracao-e-descoberta/T-02.04-protecoes.md) | T-02.03 | concluída |
 | T-02.05 | [Preferências e limiares](F02-configuracao-e-descoberta/T-02.05-preferencias-e-limiares.md) | — | concluída |
 
 ## F03 — Docker e discos virtuais

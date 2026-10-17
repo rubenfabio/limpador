@@ -11,6 +11,7 @@ pub mod item;
 pub mod message;
 pub mod ports;
 pub mod projects;
+pub mod protection;
 pub mod ranking;
 pub mod risk;
 pub mod roots;

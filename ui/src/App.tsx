@@ -5,9 +5,15 @@ import { getCoreVersion } from "./core/api";
 export function App() {
   const [version, setVersion] = useState<string>();
 
-  useEffect(() => {
-    getCoreVersion().then(setVersion, () => setVersion(undefined));
-  }, []);
+  useEffect(
+    () => {
+      getCoreVersion()
+        .then(setVersion)
+        .catch((error: unknown) => console.error("Falha ao consultar a versão do núcleo", error));
+    },
+    // Stryker disable next-line ArrayDeclaration: qualquer lista constante roda o efeito uma vez só, então o mutante é equivalente
+    [],
+  );
 
   return (
     <main>

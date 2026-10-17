@@ -9,12 +9,13 @@ fn core_version() -> &'static str {
     limpador_core::version()
 }
 
+// motivo: só abre a janela e liga as peças; as decisões estão em `sandbox` (com testes)
+// e a abertura real é coberta pelo e2e do app (T-00.04).
+#[cfg_attr(test, mutants::skip)]
 pub fn run() {
     let sandbox = sandbox::decide(std::env::var_os(SANDBOX_ENV));
-    if sandbox == SandboxDecision::Refused {
-        eprintln!(
-            "{SANDBOX_ENV} só é aceito em builds de teste (feature `sandbox`). Recusando iniciar."
-        );
+    if let Some(message) = sandbox::refusal_message(&sandbox) {
+        eprintln!("{message}");
         std::process::exit(2);
     }
 

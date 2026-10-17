@@ -24,6 +24,15 @@ pub fn decide(requested: Option<OsString>) -> SandboxDecision {
     decide_for_build(requested, cfg!(feature = "sandbox"))
 }
 
+/// Message explaining why the app must not start, if it must not.
+pub fn refusal_message(decision: &SandboxDecision) -> Option<String> {
+    (*decision == SandboxDecision::Refused).then(|| {
+        format!(
+            "{SANDBOX_ENV} só é aceito em builds de teste (feature `sandbox`). Recusando iniciar."
+        )
+    })
+}
+
 /// Where the webview keeps its profile (cache, storage) inside the fake machine, so a
 /// sandboxed run never writes to the user's real app-data folders.
 pub fn webview_data_dir(root: &Path) -> PathBuf {
@@ -41,6 +50,22 @@ fn decide_for_build(requested: Option<OsString>, sandbox_build: bool) -> Sandbox
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn t00_02_ca5_refused_sandbox_stops_startup_with_explanation() {
+        let message = refusal_message(&SandboxDecision::Refused).unwrap();
+        assert!(message.contains(SANDBOX_ENV));
+        assert!(message.contains("builds de teste"));
+    }
+
+    #[test]
+    fn allowed_decisions_do_not_stop_startup() {
+        assert_eq!(refusal_message(&SandboxDecision::Disabled), None);
+        assert_eq!(
+            refusal_message(&SandboxDecision::Enabled("C:\\maquina-falsa".into())),
+            None
+        );
+    }
 
     #[test]
     fn t00_04_ca4_webview_data_stays_inside_the_fake_machine() {

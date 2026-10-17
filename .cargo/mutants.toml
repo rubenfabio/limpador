@@ -1,0 +1,14 @@
+# cargo-mutants (T-00.05). The per-file gate lives in tools/mutation.
+# Test-only code is not measured (ADR-0011): the fake machine and the app entry point.
+exclude_globs = ["crates/testkit/**", "src-tauri/src/main.rs", "src-tauri/build.rs"]
+# The sandbox path of the app is only compiled with this feature; mutate it too.
+additional_cargo_args = ["--all-features"]
+# Do not copy gitignored folders (pnpm node_modules are full of symlinks, which
+# Windows only lets administrators create; target/ is rebuilt anyway).
+gitignore = true
+# Mutants to skip. Every entry needs a "# motivo:" line right above it (checked by
+# tools/mutation, T-00.05 CA4).
+exclude_re = [
+  # motivo: no Windows todo processo tem código de saída, então o -1 (morto por sinal) nunca é usado
+  "delete - in <impl CommandRunner for SystemCommandRunner>::run",
+]

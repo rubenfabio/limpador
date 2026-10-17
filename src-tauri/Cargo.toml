@@ -22,5 +22,9 @@ tauri-build = { version = "2", features = [] }
 limpador-core = { path = "../crates/core" }
 tauri = { version = "2", features = [] }
 
+[dev-dependencies]
+# Only for `#[cfg_attr(test, mutants::skip)]`; never part of a release build.
+mutants = "0.0.3"
+
 [lints]
 workspace = true

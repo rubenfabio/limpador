@@ -57,6 +57,7 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 - WebView2 Runtime (já vem no Windows 11).
 - `cargo install tauri-driver --locked` para o e2e do app real. O `msedgedriver` da versão do WebView2 é baixado automaticamente para `.cache/msedgedriver/`.
 - `pnpm --filter ui exec playwright install chromium` para o e2e da interface.
+- `cargo install cargo-mutants --locked` para a mutação do Rust.
 
 ## Comandos
 
@@ -68,6 +69,8 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 | `pnpm fmt` | Formata Rust e TS |
 | `pnpm --filter ui e2e` | Só o e2e da interface (Playwright, núcleo simulado) |
 | `pnpm --filter e2e-app e2e` | Só o e2e do app real (WebdriverIO + tauri-driver, em sandbox) |
+| `pnpm mutation` | Mutação incremental (só o que mudou desde `origin/main`), com as metas por arquivo |
+| `pnpm mutation:full` | Mutação completa |
 | `pnpm dev` | Abre o app em modo de desenvolvimento |
 | `pnpm build` | Gera o instalador |
 

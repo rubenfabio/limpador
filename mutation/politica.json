@@ -1,0 +1,26 @@
+{
+  "comentario": "Política de mutação (ADR-0011, T-00.05). Os caminhos críticos seguem a estrutura prevista do núcleo; quem criar o módulo deve manter este arquivo alinhado. Mudar a lista exige justificativa no PR.",
+  "metas": {
+    "critico": 90,
+    "padrao": 70
+  },
+  "criticos": [
+    "crates/core/src/risk/**",
+    "crates/core/src/ranking/**",
+    "crates/core/src/protection/**",
+    "crates/core/src/collectors/git/**",
+    "crates/core/src/revalidation/**",
+    "crates/core/src/quarantine/**",
+    "crates/core/src/automation/**",
+    "crates/core/src/agents/**",
+    "src-tauri/src/sandbox.rs"
+  ],
+  "foraDaMedicao": [
+    "crates/testkit/**",
+    "src-tauri/src/main.rs",
+    "src-tauri/build.rs",
+    "ui/src/main.tsx",
+    "ui/e2e/**",
+    "**/*.test.*"
+  ]
+}

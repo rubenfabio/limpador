@@ -12,7 +12,9 @@
     "fmt": "cargo fmt --all && biome format --write .",
     "dev": "tauri dev",
     "build": "tauri build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "mutation": "node tools/mutation/run.mjs",
+    "mutation:full": "node tools/mutation/run.mjs --full"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

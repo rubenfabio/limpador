@@ -1650,6 +1650,7 @@ name = "limpador-app"
 version = "0.1.0"
 dependencies = [
  "limpador-core",
+ "mutants",
  "tauri",
  "tauri-build",
 ]
@@ -1776,6 +1777,12 @@ dependencies = [
  "thiserror 2.0.21",
  "windows-sys 0.61.2",
 ]
+
+[[package]]
+name = "mutants"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc0287524726960e07b119cebd01678f852f147742ae0d925e6a520dca956126"
 
 [[package]]
 name = "ndk"

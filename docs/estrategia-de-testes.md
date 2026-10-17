@@ -51,9 +51,19 @@ O app entra no "modo sandbox" por configuração **disponível só em builds de 
 | **Padrão** | **≥ 70%** | Todo o resto do núcleo e da lógica da interface |
 | Fora da medição | — | Código gerado, ponto de entrada do app, componentes puramente visuais |
 
-- Meta não atingida **bloqueia** o merge.
-- Mutantes sobreviventes que são equivalentes (não mudam comportamento) podem ser marcados como ignorados, **sempre com justificativa no código**.
-- A lista de módulos críticos fica num arquivo de configuração versionado. Mudar a lista exige justificativa no PR.
+- Meta não atingida **bloqueia** o merge. A nota é calculada **por arquivo**: (mortos + tempo esgotado) ÷ (mortos + tempo esgotado + sobreviventes). Mutantes que não compilam ou estão ignorados não contam.
+- A lista de módulos críticos e o que fica fora da medição estão em [`mutation/politica.json`](../mutation/politica.json). Mudar a lista exige justificativa no PR.
+- Mutantes sobreviventes que são equivalentes (não mudam comportamento) podem ser ignorados, **sempre com justificativa**. Sem ela, a mutação falha por configuração inválida:
+
+| Onde | Como ignorar |
+|---|---|
+| Rust, uma função | `// motivo: ...` na linha de cima de `#[cfg_attr(test, mutants::skip)]` |
+| Rust, um mutante específico | entrada em `exclude_re` de `.cargo/mutants.toml`, com `# motivo: ...` na linha de cima |
+| TypeScript | `// Stryker disable next-line <Mutador>: <motivo>` |
+
+**Comandos:** `pnpm mutation` (incremental: só o que mudou desde `origin/main`; outra base via `LIMPADOR_MUTATION_BASE`) e `pnpm mutation:full` (tudo). O resumo fica em `reports/mutation/resumo.md`, e os relatórios detalhados de cada ferramenta ficam ao lado.
+
+**Notas de ferramenta:** o Stryker usa o executor `command` (roda `vitest run` por mutante), porque o plugin do Vitest ainda não lê os resultados do Vitest 5. O `cargo-mutants` copia a árvore respeitando o `.gitignore`, porque os links simbólicos do pnpm exigiriam privilégio de administrador no Windows.
 
 ## Jornadas E2E do app real
 

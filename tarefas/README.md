@@ -27,7 +27,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 | T-00.02 | [Máquina falsa](F00-qualidade-e-testes/T-00.02-maquina-falsa.md) | T-00.01 | concluída |
 | T-00.03 | [E2E da interface](F00-qualidade-e-testes/T-00.03-e2e-de-interface.md) | T-00.01 | concluída |
 | T-00.04 | [E2E do app real](F00-qualidade-e-testes/T-00.04-e2e-do-app-real.md) | T-00.01, T-00.02 | concluída |
-| T-00.05 | [Testes de mutação](F00-qualidade-e-testes/T-00.05-testes-de-mutacao.md) | T-00.01 | pendente |
+| T-00.05 | [Testes de mutação](F00-qualidade-e-testes/T-00.05-testes-de-mutacao.md) | T-00.01 | concluída |
 | T-00.06 | [Verificações locais e CI](F00-qualidade-e-testes/T-00.06-verificacoes-locais-e-ci.md) | T-00.03, T-00.04, T-00.05 | pendente |
 | T-00.07 | [Rastreabilidade CA → teste](F00-qualidade-e-testes/T-00.07-rastreabilidade.md) | T-00.01 | pendente |
 

@@ -3,7 +3,10 @@
 //! This crate must not depend on Tauri or on the UI (ADR-0003): the desktop app,
 //! the CLI and the MCP server are thin shells around it.
 
+pub mod item;
+pub mod message;
 pub mod ports;
+pub mod risk;
 
 /// Version of the core library.
 pub fn version() -> &'static str {

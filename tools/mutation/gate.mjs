@@ -109,6 +109,21 @@ export function planIncremental(changedFiles, policy) {
   };
 }
 
+/** A unified diff that adds `path` with `text`, as `git diff` would show a new file. */
+export function newFileDiff(path, text) {
+  const lines = text.split(/\r?\n/);
+  if (lines.at(-1) === "") lines.pop();
+  return [
+    `diff --git a/${path} b/${path}`,
+    "new file mode 100644",
+    "--- /dev/null",
+    `+++ b/${path}`,
+    `@@ -0,0 +1,${lines.length} @@`,
+    ...lines.map((line) => `+${line}`),
+    "",
+  ].join("\n");
+}
+
 const RUST_SKIP = /mutants::skip/;
 const STRYKER_DISABLE = /Stryker disable(?:[ -]next-line)?\s+[\w,]+(?::\s*(\S.*))?/;
 

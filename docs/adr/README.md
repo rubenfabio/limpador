@@ -23,7 +23,7 @@ Cada arquivo registra **uma** decisão: o contexto, o que foi decidido, as alter
 | [0007](0007-ranking-por-ganho-seguro.md) | Ordenar o ranking por ganho seguro | Aceita | 2026-10-16 |
 | [0008](0008-quarentena-por-tipo-no-mesmo-volume.md) | Quarentena por tipo de item, no mesmo volume, com prazo | Aceita | 2026-10-16 |
 | [0009](0009-deteccao-de-merge-local-e-github.md) | Detectar merge combinando sinais locais e o GitHub | Aceita | 2026-10-16 |
-| [0010](0010-persistencia-local.md) | Persistência apenas local (formato a decidir) | Aceita | 2026-10-16 |
+| [0010](0010-persistencia-local.md) | Persistência apenas local (formato no 0018) | Aceita | 2026-10-16 |
 | [0011](0011-estrategia-de-testes.md) | Testes primeiro, mutação por criticidade, e2e em duas camadas | Aceita (execução substituída pelo 0017) | 2026-10-17 |
 | [0012](0012-maquina-falsa-e-sandbox.md) | Máquina falsa para testes e sandbox só em builds de teste | Aceita | 2026-10-17 |
 | [0013](0013-windows-primeiro.md) | Windows primeiro, com diferenças de plataforma isoladas | Aceita | 2026-10-16 |
@@ -31,10 +31,11 @@ Cada arquivo registra **uma** decisão: o contexto, o que foi decidido, as alter
 | [0015](0015-agentes-via-cli-e-mcp-com-aprovacao.md) | Agentes via CLI e MCP, com pedidos de aprovação | Aceita (Fase 2) | 2026-10-16 |
 | [0016](0016-estrutura-do-repositorio-e-ferramentas.md) | Estrutura do repositório e ferramentas (pnpm, Biome, comandos únicos) | Aceita | 2026-10-17 |
 | [0017](0017-ci-local.md) | CI local via hooks do git e tarefa agendada | Aceita | 2026-10-17 |
+| [0018](0018-formato-de-persistencia.md) | Configurações em TOML e histórico em SQLite | Aceita | 2026-10-17 |
 
 ## Decisões em aberto (viram ADR quando a tarefa chegar)
 
-- Formato de persistência local (T-02.05 / T-11.01).
+- Biblioteca SQLite e esquema do histórico (T-09.04 / T-11.01).
 - Biblioteca de estado e roteamento da interface (T-08.01).
 - Método de compactação de discos virtuais por edição do Windows (T-03.07).
 - Como detectar "arquivo em uso" no Windows (T-04.01, T-09.02).

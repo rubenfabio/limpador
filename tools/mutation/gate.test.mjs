@@ -5,6 +5,7 @@ import {
   fromCargoMutants,
   fromStryker,
   globToRegExp,
+  newFileDiff,
   planIncremental,
   renderSummary,
   scoreByFile,
@@ -86,6 +87,21 @@ describe("modo incremental", () => {
       policy,
     );
     expect(plan).toEqual({ rust: ["crates/core/src/ports.rs"], ts: ["src/App.tsx"] });
+  });
+
+  it("t00_05_ca3_new_untracked_files_become_a_diff_cargo_mutants_understands", () => {
+    expect(newFileDiff("crates/core/src/risk/mod.rs", "fn a() {}\r\nfn b() {}\n")).toBe(
+      [
+        "diff --git a/crates/core/src/risk/mod.rs b/crates/core/src/risk/mod.rs",
+        "new file mode 100644",
+        "--- /dev/null",
+        "+++ b/crates/core/src/risk/mod.rs",
+        "@@ -0,0 +1,2 @@",
+        "+fn a() {}",
+        "+fn b() {}",
+        "",
+      ].join("\n"),
+    );
   });
 
   it("windows paths are normalized", () => {

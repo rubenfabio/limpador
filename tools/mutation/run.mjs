@@ -11,6 +11,7 @@ import {
   fromCargoMutants,
   fromStryker,
   isExcluded,
+  newFileDiff,
   planIncremental,
   renderSummary,
   scoreByFile,
@@ -59,13 +60,24 @@ mkdirSync(reports, { recursive: true });
 let plan = { rust: true, ts: undefined };
 let rustDiff;
 if (!full) {
-  const changed = git(["diff", "--name-only", "--merge-base", base]).split("\n").filter(Boolean);
+  // `git diff` ignores files not yet tracked; new files are changes too.
+  const untracked = git(["ls-files", "--others", "--exclude-standard"]).split("\n").filter(Boolean);
+  const changed = [
+    ...git(["diff", "--name-only", "--merge-base", base]).split("\n").filter(Boolean),
+    ...untracked,
+  ];
   const incremental = planIncremental(changed, policy);
   console.log(
     `Modo incremental contra ${base}: ${incremental.rust.length} arquivo(s) Rust, ${incremental.ts.length} TS.`,
   );
   rustDiff = join(reports, "rust.diff");
-  writeFileSync(rustDiff, git(["diff", "--merge-base", base, "--", "*.rs"]));
+  const newRust = untracked
+    .filter((f) => f.endsWith(".rs"))
+    .map((f) => newFileDiff(f, readFileSync(join(root, f), "utf8")));
+  writeFileSync(
+    rustDiff,
+    [git(["diff", "--merge-base", base, "--", "*.rs"]), ...newRust].join("\n"),
+  );
   plan = { rust: incremental.rust.length > 0, ts: incremental.ts };
 }
 

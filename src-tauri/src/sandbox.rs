@@ -5,7 +5,7 @@
 //! never be redirected on a user's machine.
 
 use std::ffi::OsString;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Environment variable that points the app at a fake machine.
 pub const SANDBOX_ENV: &str = "LIMPADOR_SANDBOX";
@@ -24,6 +24,12 @@ pub fn decide(requested: Option<OsString>) -> SandboxDecision {
     decide_for_build(requested, cfg!(feature = "sandbox"))
 }
 
+/// Where the webview keeps its profile (cache, storage) inside the fake machine, so a
+/// sandboxed run never writes to the user's real app-data folders.
+pub fn webview_data_dir(root: &Path) -> PathBuf {
+    root.join("app-data").join("webview")
+}
+
 fn decide_for_build(requested: Option<OsString>, sandbox_build: bool) -> SandboxDecision {
     match requested {
         None => SandboxDecision::Disabled,
@@ -35,6 +41,14 @@ fn decide_for_build(requested: Option<OsString>, sandbox_build: bool) -> Sandbox
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn t00_04_ca4_webview_data_stays_inside_the_fake_machine() {
+        let root = Path::new("C:\\maquina-falsa");
+        let dir = webview_data_dir(root);
+        assert!(dir.starts_with(root));
+        assert_ne!(dir, root);
+    }
 
     #[test]
     fn t00_02_ca5_production_build_refuses_sandbox() {

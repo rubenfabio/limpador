@@ -48,18 +48,30 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 - **Catálogo de locais** declarativo, sem caminhos de terceiros fixos no código ([ADR-0005](docs/adr/0005-catalogo-de-locais-orientado-a-dados.md)).
 - **Persistência apenas local**; o formato ainda será decidido ([ADR-0010](docs/adr/0010-persistencia-local.md)).
 - **Textos por chave de tradução**, inclusive os motivos gerados pelo núcleo ([ADR-0014](docs/adr/0014-textos-por-chave-de-traducao.md)).
-- **Estrutura e ferramentas**: `crates/core` (núcleo), `src-tauri` (casca), `ui/` (interface), `tools/` (verificações); pnpm, Biome, rustfmt e clippy ([ADR-0016](docs/adr/0016-estrutura-do-repositorio-e-ferramentas.md)).
+- **Estrutura e ferramentas**: `crates/core` (núcleo), `crates/testkit` (máquina falsa, só testes), `src-tauri` (casca), `ui/` (interface), `e2e-app/` (e2e do app real), `tools/` (verificações); pnpm, Biome, rustfmt e clippy ([ADR-0016](docs/adr/0016-estrutura-do-repositorio-e-ferramentas.md)).
+
+## Pré-requisitos (Windows)
+
+- Rust (rustup, toolchain MSVC) e Visual Studio Build Tools com C++.
+- Node 24+ e pnpm 11.
+- WebView2 Runtime (já vem no Windows 11).
+- `cargo install tauri-driver --locked` para o e2e do app real. O `msedgedriver` da versão do WebView2 é baixado automaticamente para `.cache/msedgedriver/`.
+- `pnpm --filter ui exec playwright install chromium` para o e2e da interface.
 
 ## Comandos
 
 | Comando | O que faz |
 |---|---|
 | `pnpm install` | Instala as dependências JS |
-| `pnpm test` | Todos os testes: núcleo e app (cargo), interface e ferramentas (Vitest) |
+| `pnpm test` | Todos os testes: unitários e integração (cargo, Vitest), e2e da interface e e2e do app real |
 | `pnpm check` | Formatação, lint (clippy, Biome) e tipos |
 | `pnpm fmt` | Formata Rust e TS |
+| `pnpm --filter ui e2e` | Só o e2e da interface (Playwright, núcleo simulado) |
+| `pnpm --filter e2e-app e2e` | Só o e2e do app real (WebdriverIO + tauri-driver, em sandbox) |
 | `pnpm dev` | Abre o app em modo de desenvolvimento |
 | `pnpm build` | Gera o instalador |
+
+Relatórios e artefatos de falha (capturas de tela, logs, listagem da máquina falsa) ficam em `reports/`.
 
 ## Invariantes de segurança (inegociáveis)
 

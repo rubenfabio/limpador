@@ -9,6 +9,7 @@ node_modules/
 
 # Relatórios de teste
 /reports/
+/.cache/
 /mutants.out*/
 coverage/
 

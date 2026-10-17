@@ -1,3 +1,11 @@
 packages:
   - ui
   - tools
+  - e2e-app
+
+# Install scripts allowed to run. edgedriver/geckodriver would download drivers we
+# do not use: e2e-app/driver.mjs fetches the msedgedriver matching WebView2.
+allowBuilds:
+  edgedriver: false
+  esbuild: true
+  geckodriver: false

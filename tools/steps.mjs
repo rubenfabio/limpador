@@ -11,6 +11,8 @@ export const groups = {
     ],
     ["interface (vitest)", "pnpm", ["--filter", "ui", "test"]],
     ["e2e da interface (playwright)", "pnpm", ["--filter", "ui", "e2e"]],
+    ["auxiliares do e2e do app (vitest)", "pnpm", ["--filter", "e2e-app", "test"]],
+    ["e2e do app real (webdriver)", "pnpm", ["--filter", "e2e-app", "e2e"]],
     ["ferramentas (vitest)", "pnpm", ["--filter", "tools", "test"]],
   ],
   check: [

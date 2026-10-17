@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "create": false,
         "label": "main",
         "title": "Limpador",
         "width": 1100,

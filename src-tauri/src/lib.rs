@@ -10,7 +10,8 @@ fn core_version() -> &'static str {
 }
 
 pub fn run() {
-    if sandbox::decide(std::env::var_os(SANDBOX_ENV)) == SandboxDecision::Refused {
+    let sandbox = sandbox::decide(std::env::var_os(SANDBOX_ENV));
+    if sandbox == SandboxDecision::Refused {
         eprintln!(
             "{SANDBOX_ENV} só é aceito em builds de teste (feature `sandbox`). Recusando iniciar."
         );
@@ -18,6 +19,23 @@ pub fn run() {
     }
 
     tauri::Builder::default()
+        // The main window is created here (not by tauri.conf.json) so that a sandboxed
+        // run can keep the webview profile inside the fake machine.
+        .setup(move |app| {
+            let config = app
+                .config()
+                .app
+                .windows
+                .first()
+                .ok_or("main window missing from tauri.conf.json")?
+                .clone();
+            let mut window = tauri::WebviewWindowBuilder::from_config(app.handle(), &config)?;
+            if let SandboxDecision::Enabled(root) = &sandbox {
+                window = window.data_directory(sandbox::webview_data_dir(root));
+            }
+            window.build()?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![core_version])
         .run(tauri::generate_context!())
         .expect("failed to run Limpador");

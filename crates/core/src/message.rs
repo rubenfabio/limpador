@@ -1,9 +1,10 @@
 //! Translatable text produced by the core (ADR-0014): a key plus named parameters.
 //! The shells (UI, CLI, MCP) turn it into a sentence in the user's language.
 
+use serde::Serialize;
 use std::collections::BTreeMap;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct Message {
     pub key: String,
     pub params: BTreeMap<String, String>,

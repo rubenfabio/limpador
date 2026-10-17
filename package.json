@@ -7,6 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "test": "node tools/run.mjs test",
     "check": "node tools/run.mjs check",
     "fmt": "cargo fmt --all && biome format --write .",

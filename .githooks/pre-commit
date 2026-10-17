@@ -1,0 +1,4 @@
+#!/bin/sh
+# Verificações rápidas antes do commit (T-00.06): formatação, lint e unitários do que mudou.
+# Instalado por `pnpm install`. Em emergência: git commit --no-verify.
+exec node tools/precommit.mjs

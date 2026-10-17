@@ -76,6 +76,26 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 
 Relatórios e artefatos de falha (capturas de tela, logs, listagem da máquina falsa) ficam em `reports/`.
 
+**Antes de cada commit**, o hook `.githooks/pre-commit` (ligado pelo `pnpm install`) roda formatação, Biome e os unitários apenas do que mudou. Commits só de documentação não rodam nada.
+
+## CI e equivalentes locais
+
+O CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) roda em Windows. Cada passo pode ser reproduzido localmente com o mesmo comando:
+
+| Quando | Passo do CI | Comando local |
+|---|---|---|
+| Push e PR | Toolchain Rust fixada | `rustup show` |
+| Push e PR | tauri-driver | `cargo install tauri-driver --locked` |
+| Push e PR | Dependências JS | `pnpm install --frozen-lockfile` |
+| Push e PR | Navegador do e2e da interface | `pnpm --filter ui exec playwright install chromium` |
+| Push e PR | Formatação, lint e tipos | `pnpm check` |
+| Push e PR | Testes, e2e e rastreabilidade | `pnpm test` |
+| PR | cargo-mutants | `cargo install cargo-mutants --locked` |
+| PR | Mutação só do código alterado | `pnpm mutation` (com `LIMPADOR_MUTATION_BASE=origin/<branch base>`) |
+| Semanal | Mutação completa; abre uma issue se alguma meta cair | `pnpm mutation:full` |
+
+Quando um passo falha, o CI anexa `reports/` (capturas de tela, logs, máquina falsa, relatórios de mutação) como artefato da execução.
+
 ## Invariantes de segurança (inegociáveis)
 
 Qualquer código que remova algo **deve** respeitar:

@@ -1,6 +1,6 @@
 # ADR-0011 — Testes primeiro, mutação com metas por criticidade e e2e em duas camadas
 
-- **Status:** Aceita
+- **Status:** Aceita — a parte "Execução" (CI no GitHub Actions) foi substituída pelo [ADR-0017](0017-ci-local.md)
 - **Data:** 2026-10-17
 - **Decisores:** Dono do produto
 - **Tarefas relacionadas:** F00 (T-00.01–T-00.07), todas

@@ -71,6 +71,8 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 | `pnpm --filter e2e-app e2e` | Só o e2e do app real (WebdriverIO + tauri-driver, em sandbox) |
 | `pnpm mutation` | Mutação incremental (só o que mudou desde `origin/main`), com as metas por arquivo |
 | `pnpm mutation:full` | Mutação completa |
+| `pnpm ci` | CI local completo: check + test + mutação incremental (o mesmo do hook pre-push) |
+| `pnpm mutation:agendar` | Registra (ou atualiza) a tarefa agendada do Windows da mutação semanal |
 | `pnpm dev` | Abre o app em modo de desenvolvimento |
 | `pnpm build` | Gera o instalador |
 
@@ -78,23 +80,32 @@ Relatórios e artefatos de falha (capturas de tela, logs, listagem da máquina f
 
 **Antes de cada commit**, o hook `.githooks/pre-commit` (ligado pelo `pnpm install`) roda formatação, Biome e os unitários apenas do que mudou. Commits só de documentação não rodam nada.
 
-## CI e equivalentes locais
+## CI (local) — [ADR-0017](docs/adr/0017-ci-local.md)
 
-O CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) roda em Windows. Cada passo pode ser reproduzido localmente com o mesmo comando:
+O CI do projeto roda **na máquina de quem desenvolve**, não no GitHub:
 
-| Quando | Passo do CI | Comando local |
+| Quando | O que roda | Como |
 |---|---|---|
-| Push e PR | Toolchain Rust fixada | `rustup show` |
-| Push e PR | tauri-driver | `cargo install tauri-driver --locked` |
-| Push e PR | Dependências JS | `pnpm install --frozen-lockfile` |
-| Push e PR | Navegador do e2e da interface | `pnpm --filter ui exec playwright install chromium` |
-| Push e PR | Formatação, lint e tipos | `pnpm check` |
-| Push e PR | Testes, e2e e rastreabilidade | `pnpm test` |
-| PR | cargo-mutants | `cargo install cargo-mutants --locked` |
-| PR | Mutação só do código alterado | `pnpm mutation` (com `LIMPADOR_MUTATION_BASE=origin/<branch base>`) |
-| Semanal | Mutação completa; abre uma issue se alguma meta cair | `pnpm mutation:full` |
+| Antes de cada commit | Formatação, Biome e unitários do que mudou | hook `.githooks/pre-commit` |
+| Antes de cada push | `pnpm ci`: check + test (inclui os dois e2e e a rastreabilidade) + mutação incremental só do que vai subir. **Recusa o push se falhar.** Push só de documentação pula. | hook `.githooks/pre-push` |
+| Toda segunda, 09:00 (ou assim que o PC ligar) | `pnpm mutation:full`; **notificação do Windows** se alguma meta cair | tarefa agendada "Limpador - mutacao semanal" (`pnpm mutation:agendar`) |
 
-Quando um passo falha, o CI anexa `reports/` (capturas de tela, logs, máquina falsa, relatórios de mutação) como artefato da execução.
+Os hooks são ligados pelo `pnpm install`. Em emergência, `--no-verify` pula um hook; não use isso para esconder falha.
+
+O workflow do GitHub ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) fica **só manual**, para quando a conta voltar a ter Actions. Equivalentes locais de cada passo dele:
+
+| Passo do workflow | Comando local |
+|---|---|
+| Toolchain Rust fixada | `rustup show` |
+| tauri-driver | `cargo install tauri-driver --locked` |
+| cargo-mutants | `cargo install cargo-mutants --locked` |
+| Dependências JS | `pnpm install --frozen-lockfile` |
+| Navegador do e2e da interface | `pnpm --filter ui exec playwright install chromium` |
+| Formatação, lint e tipos | `pnpm check` |
+| Testes, e2e e rastreabilidade | `pnpm test` |
+| Mutação completa | `pnpm mutation:full` |
+
+A branch `main` no GitHub é protegida contra force-push e exclusão.
 
 ## Invariantes de segurança (inegociáveis)
 

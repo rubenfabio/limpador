@@ -100,12 +100,13 @@ Jornadas da Fase 2 (agentes via MCP) entram quando F12 começar.
 
 ## Pipeline
 
+O CI roda localmente ([ADR-0017](adr/0017-ci-local.md)):
+
 | Quando | O que roda | Tempo alvo |
 |---|---|---|
-| Antes do commit (local) | Formatação, lint, unitários dos módulos alterados | < 1 min |
-| Cada push (CI, Windows) | Formatação, lint, unitários, integração do núcleo, E2E interface, E2E app real, rastreabilidade | < 20 min |
-| Cada PR (CI) | Tudo acima + **mutação incremental** só no código alterado, com as metas | < 30 min |
-| Semanal (CI) | Mutação completa + relatório de tendência | sem limite rígido |
+| Antes do commit (hook) | Formatação, lint, unitários dos módulos alterados | < 1 min |
+| Antes do push (hook, `pnpm ci`) | Formatação, lint, unitários, integração do núcleo, E2E interface, E2E app real, rastreabilidade + **mutação incremental** do que vai subir, com as metas. Recusa o push se falhar | < 15 min |
+| Semanal (tarefa agendada do Windows) | Mutação completa; notificação se alguma meta cair | sem limite rígido |
 
 ## Cuidados específicos do Windows
 

@@ -15,7 +15,9 @@
     "build": "tauri build",
     "tauri": "tauri",
     "mutation": "node tools/mutation/run.mjs",
-    "mutation:full": "node tools/mutation/run.mjs --full"
+    "mutation:full": "node tools/mutation/run.mjs --full",
+    "ci": "node tools/run.mjs ci",
+    "mutation:agendar": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/agendar-mutacao-semanal.ps1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

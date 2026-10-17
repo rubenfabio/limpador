@@ -1,0 +1,4 @@
+#!/bin/sh
+# CI local antes do push (T-00.06, ADR-0017): check + test + mutação incremental do que vai subir.
+# Push só de documentação pula. Instalado por `pnpm install`. Em emergência: git push --no-verify.
+exec node tools/prepush.mjs

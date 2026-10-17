@@ -72,39 +72,3 @@ describe("pre-commit: o hook do git", () => {
     expect(pkg.scripts.prepare).toBe("git config core.hooksPath .githooks");
   });
 });
-
-describe("CI (.github/workflows/ci.yml)", () => {
-  const workflow = readFileSync(join(repoRoot, ".github", "workflows", "ci.yml"), "utf8");
-  const agents = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
-  const runs = [...workflow.matchAll(/^\s*run: (.+)$/gm)].map((m) => m[1].trim());
-
-  it("t00_06_ca2_failed_runs_upload_screenshots_and_logs", () => {
-    expect(workflow).toMatch(
-      /if: failure\(\)\s+uses: actions\/upload-artifact@v\d+\s+with:\s+name: relatorios-[^\n]+\s+path: reports\//,
-    );
-    expect(runs).toContain("pnpm test");
-    expect(workflow).toContain("runs-on: windows-latest");
-  });
-
-  it("t00_06_ca3_pull_requests_run_incremental_mutation_against_the_base", () => {
-    expect(workflow).toMatch(
-      /if: github\.event_name == 'pull_request'[\s\S]+run: pnpm mutation\n\s+env:\s+LIMPADOR_MUTATION_BASE: origin\/\$\{\{ github\.base_ref \}\}/,
-    );
-  });
-
-  it("t00_06_ca4_weekly_full_mutation_opens_an_issue_when_a_target_drops", () => {
-    expect(workflow).toMatch(/cron: "0 6 \* \* 1"/);
-    expect(workflow).toMatch(
-      /run: pnpm mutation:full[\s\S]+if: failure\(\)[\s\S]+run: gh issue create/,
-    );
-    expect(workflow).toMatch(/issues: write/);
-  });
-
-  it("t00_06_ca5_every_ci_command_has_a_documented_local_equivalent", () => {
-    const local = runs.filter((cmd) => !cmd.startsWith("gh "));
-    expect(local.length).toBeGreaterThan(5);
-    for (const cmd of local) {
-      expect(agents, `"${cmd}" não está documentado no AGENTS.md`).toContain(`\`${cmd}\``);
-    }
-  });
-});

@@ -1,59 +1,19 @@
-# CI (T-00.06, ADR-0011). Every `run:` here has a local equivalent listed in AGENTS.md.
+# CI no GitHub — DESLIGADO por padrão (ADR-0017). O CI do projeto roda localmente:
+# `pnpm ci` no hook pre-push e a mutação completa semanal numa tarefa agendada do Windows.
+# Este workflow só roda quando disparado à mão (Actions → CI → Run workflow).
+# Para religar em push/PR, volte a pôr `push`, `pull_request` e `schedule` em `on:`.
+# Cada `run:` aqui tem equivalente local documentado no AGENTS.md.
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-  schedule:
-    # Mondays 06:00 UTC: full mutation run.
-    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
-  cancel-in-progress: true
-
 jobs:
   verificacoes:
     name: Verificações e testes (Windows)
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-    runs-on: windows-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-      - name: Toolchain Rust fixada
-        run: rustup show
-      - uses: Swatinem/rust-cache@v2
-      - name: tauri-driver (e2e do app real)
-        run: cargo install tauri-driver --locked
-      - name: Dependências JS
-        run: pnpm install --frozen-lockfile
-      - name: Navegador do e2e da interface
-        run: pnpm --filter ui exec playwright install chromium
-      - name: Formatação, lint e tipos
-        run: pnpm check
-      - name: Testes (unitários, integração, e2e e rastreabilidade)
-        run: pnpm test
-      - name: Artefatos de falha (capturas de tela, logs, máquina falsa)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: relatorios-${{ github.run_id }}
-          path: reports/
-          if-no-files-found: ignore
-
-  mutacao-incremental:
-    name: Mutação incremental (PR)
-    if: github.event_name == 'pull_request'
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
@@ -68,56 +28,24 @@ jobs:
       - name: Toolchain Rust fixada
         run: rustup show
       - uses: Swatinem/rust-cache@v2
+      - name: tauri-driver (e2e do app real)
+        run: cargo install tauri-driver --locked
       - name: cargo-mutants
         run: cargo install cargo-mutants --locked
       - name: Dependências JS
         run: pnpm install --frozen-lockfile
-      - name: Mutação só do código alterado, com as metas
-        run: pnpm mutation
-        env:
-          LIMPADOR_MUTATION_BASE: origin/${{ github.base_ref }}
-      - name: Relatório de mutação
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: mutacao-${{ github.run_id }}
-          path: reports/mutation/
-          if-no-files-found: ignore
-
-  mutacao-completa:
-    name: Mutação completa (semanal)
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: windows-latest
-    timeout-minutes: 120
-    permissions:
-      contents: read
-      issues: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-      - name: Toolchain Rust fixada
-        run: rustup show
-      - uses: Swatinem/rust-cache@v2
-      - name: cargo-mutants
-        run: cargo install cargo-mutants --locked
-      - name: Dependências JS
-        run: pnpm install --frozen-lockfile
+      - name: Navegador do e2e da interface
+        run: pnpm --filter ui exec playwright install chromium
+      - name: Formatação, lint e tipos
+        run: pnpm check
+      - name: Testes (unitários, integração, e2e e rastreabilidade)
+        run: pnpm test
       - name: Mutação completa
         run: pnpm mutation:full
-      - name: Relatório de mutação
+      - name: Relatórios (capturas de tela, logs, máquina falsa, mutação)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mutacao-completa-${{ github.run_id }}
-          path: reports/mutation/
+          name: relatorios-${{ github.run_id }}
+          path: reports/
           if-no-files-found: ignore
-      - name: Abrir aviso de meta de mutação abaixo do esperado
-        if: failure()
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh issue create --repo "${{ github.repository }}" --title "Mutação semanal abaixo da meta (${{ github.run_id }})" --body-file reports/mutation/resumo.md

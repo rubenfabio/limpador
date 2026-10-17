@@ -14,8 +14,10 @@ test("t00_03_ca2_test_sees_which_calls_the_interface_made", async ({ page }) => 
   await simulateCore(page, scenarios.basico);
   await page.goto("/");
   await expect(page.getByTestId("core-version")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Analisar agora" })).toBeVisible();
 
-  expect(await ipcCalls(page)).toEqual([{ cmd: "core_version", args: {} }]);
+  const commands = (await ipcCalls(page)).map((c) => c.cmd).sort();
+  expect(commands).toEqual(["core_version", "get_settings"]);
 });
 
 test("core failure keeps the interface usable", async ({ page }) => {

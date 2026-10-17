@@ -11,6 +11,7 @@ pub mod engine;
 pub mod glob;
 pub mod item;
 pub mod message;
+pub mod onboarding;
 pub mod ports;
 pub mod projects;
 pub mod protection;

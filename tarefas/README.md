@@ -46,7 +46,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 
 | ID | Tarefa | Depende de | Status |
 |---|---|---|---|
-| T-02.01 | [Primeira execução](F02-configuracao-e-descoberta/T-02.01-primeira-execucao.md) | T-02.05, T-02.03 | pendente |
+| T-02.01 | [Primeira execução](F02-configuracao-e-descoberta/T-02.01-primeira-execucao.md) | T-02.05, T-02.03 | concluída |
 | T-02.02 | [Pastas raiz e exclusões](F02-configuracao-e-descoberta/T-02.02-pastas-raiz-e-exclusoes.md) | T-02.05 | concluída |
 | T-02.03 | [Identificação de projetos](F02-configuracao-e-descoberta/T-02.03-identificacao-de-projetos.md) | T-02.02 | concluída |
 | T-02.04 | [Proteções](F02-configuracao-e-descoberta/T-02.04-protecoes.md) | T-02.03 | concluída |
@@ -114,7 +114,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 | T-08.04 | [Detalhe do item](F08-interface/T-08.04-detalhe-do-item.md) | T-08.02 | pendente |
 | T-08.05 | [Seleção e resumo](F08-interface/T-08.05-selecao-e-resumo.md) | T-08.02, T-01.02 | pendente |
 | T-08.06 | [Progresso e estados](F08-interface/T-08.06-progresso-e-estados.md) | T-01.05 | pendente |
-| T-08.07 | [Textos e tradução](F08-interface/T-08.07-textos-e-traducao.md) | — | pendente |
+| T-08.07 | [Textos e tradução](F08-interface/T-08.07-textos-e-traducao.md) | — | concluída |
 
 ## F09 — Limpeza e quarentena
 

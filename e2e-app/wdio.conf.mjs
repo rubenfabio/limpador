@@ -38,6 +38,17 @@ function listing(dir) {
     .join("\n");
 }
 
+/** Projects every journey starts with: the sandboxed app suggests `Projetos` (3 projects). */
+export const SEEDED_PROJECTS = ["api", "web", "cli"];
+
+function seedFakeMachine(root) {
+  for (const name of SEEDED_PROJECTS) {
+    const project = join(root, "Projetos", name);
+    mkdirSync(project, { recursive: true });
+    writeFileSync(join(project, "package.json"), JSON.stringify({ name }));
+  }
+}
+
 /** Resolves once something accepts TCP connections on `port`, or rejects after `timeoutMs`. */
 async function waitForPort(port, timeoutMs) {
   const deadline = Date.now() + timeoutMs;
@@ -105,6 +116,7 @@ export const config = {
   beforeSession: async () => {
     // A fresh fake machine per spec file; the app finds it through LIMPADOR_SANDBOX.
     sandboxRoot = mkdtempSync(join(tmpdir(), "limpador-e2e-app-"));
+    seedFakeMachine(sandboxRoot);
     appLog = `${sandboxRoot}.log`;
     const log = createWriteStream(appLog);
 

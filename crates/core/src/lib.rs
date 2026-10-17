@@ -3,6 +3,7 @@
 //! This crate must not depend on Tauri or on the UI (ADR-0003): the desktop app,
 //! the CLI and the MCP server are thin shells around it.
 
+pub mod activity;
 pub mod collector;
 pub mod config;
 pub mod glob;

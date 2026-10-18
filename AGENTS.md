@@ -87,7 +87,7 @@ O CI do projeto roda **na máquina de quem desenvolve**, não no GitHub:
 | Quando | O que roda | Como |
 |---|---|---|
 | Antes de cada commit | Formatação, Biome e unitários do que mudou | hook `.githooks/pre-commit` |
-| Antes de cada push | `pnpm ci`: check + test (inclui os dois e2e e a rastreabilidade) + mutação incremental só do que vai subir. **Recusa o push se falhar.** Push só de documentação pula. | hook `.githooks/pre-push` |
+| Antes de cada push | `pnpm ci`: check + test (inclui os dois e2e e a rastreabilidade) + mutação incremental só do que vai subir, **numa cópia limpa do commit enviado** (`git worktree` temporário; compilações em `target/ci`). **Recusa o push se falhar** e copia os relatórios para `reports/`. Push só de documentação pula. Dá para continuar editando durante o push. | hook `.githooks/pre-push` |
 | Toda segunda, 09:00 (ou assim que o PC ligar) | `pnpm mutation:full`; **notificação do Windows** se alguma meta cair | tarefa agendada "Limpador - mutacao semanal" (`pnpm mutation:agendar`) |
 
 Os hooks são ligados pelo `pnpm install`. Em emergência, `--no-verify` pula um hook; não use isso para esconder falha.

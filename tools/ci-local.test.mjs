@@ -3,7 +3,7 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { isDocumentation, needsCi, parsePushedRefs } from "./prepush.mjs";
+import { ciEnvironment, isDocumentation, needsCi, parsePushedRefs } from "./prepush.mjs";
 import { groups } from "./steps.mjs";
 import { weeklyNotice } from "./weekly-mutation.mjs";
 
@@ -48,6 +48,15 @@ describe("CI local: o que roda antes do push (ADR-0017)", () => {
         remoteSha: undefined,
       },
     ]);
+  });
+
+  it("the clean checkout shares builds and downloads and compares against the pushed base", () => {
+    expect(ciEnvironment("C:\repo", "abc123")).toEqual({
+      CARGO_TARGET_DIR: join("C:\repo", "target", "ci"),
+      LIMPADOR_CACHE_DIR: join("C:\repo", ".cache"),
+      LIMPADOR_MUTATION_BASE: "abc123",
+    });
+    expect(ciEnvironment("C:\repo", undefined)).not.toHaveProperty("LIMPADOR_MUTATION_BASE");
   });
 
   it("documentation-only pushes skip the local CI", () => {

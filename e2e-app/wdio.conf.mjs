@@ -19,7 +19,12 @@ import { ensureDriver } from "./driver.mjs";
 const repoRoot = resolve(import.meta.dirname, "..");
 const meta = Boolean(process.env.LIMPADOR_E2E_META);
 const reports = resolve(process.env.LIMPADOR_E2E_OUTPUT ?? join(repoRoot, "reports", "e2e-app"));
-const application = join(repoRoot, "target", "debug", "limpador-app.exe");
+// The CI runs in a clean checkout with its own CARGO_TARGET_DIR (tools/prepush.mjs).
+const application = join(
+  process.env.CARGO_TARGET_DIR ?? join(repoRoot, "target"),
+  "debug",
+  "limpador-app.exe",
+);
 const tauriDriverExe = join(homedir(), ".cargo", "bin", "tauri-driver.exe");
 
 let tauriDriver;
@@ -91,7 +96,7 @@ export const config = {
       mkdirSync(reports, { recursive: true });
       // Workers are forked after onPrepare and inherit this variable.
       process.env.LIMPADOR_NATIVE_DRIVER = await ensureDriver(
-        join(repoRoot, ".cache", "msedgedriver"),
+        join(process.env.LIMPADOR_CACHE_DIR ?? join(repoRoot, ".cache"), "msedgedriver"),
       );
 
       // Production UI bundle, even when the caller (e.g. Vitest) has NODE_ENV=test.

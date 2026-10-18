@@ -296,9 +296,9 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::adapters::SystemClock;
     use crate::collector::tests::{FakeCollector, NoCommands};
     use crate::collector::{CleanOutcome, CollectorDescriptor, Revalidation};
-    use crate::ports::SystemClock;
     use crate::risk::Destination;
     use std::sync::atomic::{AtomicUsize, Ordering};
 

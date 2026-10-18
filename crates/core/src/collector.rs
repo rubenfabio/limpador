@@ -237,8 +237,9 @@ impl Registry {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
+    use crate::adapters::SystemClock;
     use crate::item::{ItemDraft, Resource, Risk};
-    use crate::ports::{CommandOutput, SystemClock};
+    use crate::ports::CommandOutput;
     use std::io;
     use std::sync::Mutex;
     use std::time::Duration;

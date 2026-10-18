@@ -10,7 +10,8 @@ license = "MIT"
 repository = "https://github.com/rubenfabio/limpador"
 
 [workspace.lints.rust]
-unsafe_code = "forbid"
+# Denied everywhere; only the Windows adapter of the core allows it (ADR-0022).
+unsafe_code = "deny"
 
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }

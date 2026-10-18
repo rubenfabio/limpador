@@ -181,7 +181,7 @@ fn in_dependency_folder(relative: &Path) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ports::SystemCommandRunner;
+    use crate::adapters::SystemCommandRunner;
     use crate::projects::{DiscoveryOptions, discover};
     use limpador_testkit::{FakeMachine, ProjectSpec};
 

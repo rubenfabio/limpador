@@ -82,7 +82,7 @@ impl GitRepo {
         // Identity, hooks and signing come from the isolated config written by FakeMachine.
         let mut command = Command::new("git");
         // Git exports repository locations to hooks; tests run from hooks must not use them.
-        for var in limpador_core::ports::GIT_LOCATION_VARS {
+        for var in limpador_core::adapters::GIT_LOCATION_VARS {
             command.env_remove(var);
         }
         let output = command

@@ -1,11 +1,11 @@
 //! I1 "analysis never changes anything", enforced in tests with the fake machine.
 
+use limpador_core::adapters::SystemCommandRunner;
 use limpador_core::collector::{
     AnalysisContext, CleanOutcome, Collector, CollectorDescriptor, CollectorError, Detection,
     KindSpec, Revalidation, StopSignal,
 };
 use limpador_core::item::{Category, Item, Nature};
-use limpador_core::ports::SystemCommandRunner;
 use limpador_core::risk::Destination;
 use limpador_testkit::{FakeMachine, ProjectSpec};
 use std::fs;
@@ -58,7 +58,7 @@ impl Collector for ScanCollector {
 fn analyze(collector: &dyn Collector, roots: &Path) {
     let ctx = AnalysisContext::new(
         vec![roots.to_owned()],
-        Arc::new(limpador_core::ports::SystemClock),
+        Arc::new(limpador_core::adapters::SystemClock),
         Arc::new(SystemCommandRunner),
         StopSignal::new(None),
         Arc::new(|_| {}),

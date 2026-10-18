@@ -4,11 +4,9 @@ mod preferences;
 
 pub use preferences::{Frequency, OutOfRange, Preferences, Schedule};
 
-use crate::message::Message;
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 /// Folders analyzed for projects and paths/patterns left out (T-02.02).
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -67,81 +65,20 @@ pub enum ConfigError {
     Io(io::Error),
 }
 
-/// Reads and writes `config.toml` in the app's configuration folder.
-#[derive(Debug, Clone)]
-pub struct ConfigStore {
-    path: PathBuf,
-}
-
-impl ConfigStore {
-    pub fn new(folder: &Path) -> Self {
-        Self {
-            path: folder.join("config.toml"),
-        }
-    }
-
-    pub fn path(&self) -> &Path {
-        &self.path
-    }
-
-    /// Loads the configuration. A missing file means defaults; an unreadable file or
-    /// out-of-range values fall back to defaults, with a warning for each problem.
-    pub fn load(&self) -> (Config, Vec<Message>) {
-        let text = match fs::read_to_string(&self.path) {
-            Ok(text) => text,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => return (Config::default(), vec![]),
-            Err(e) => {
-                return (
-                    Config::default(),
-                    vec![Message::new("config.unreadable").with("error", e)],
-                );
-            }
-        };
-        let mut config: Config = match toml::from_str(&text) {
-            Ok(config) => config,
-            Err(e) => {
-                return (
-                    Config::default(),
-                    vec![Message::new("config.invalid_file").with("error", e.message())],
-                );
-            }
-        };
-        let warnings = config
-            .preferences
-            .sanitize()
-            .into_iter()
-            .map(|field| Message::new("config.value_reset").with("field", field))
-            .collect();
-        (config, warnings)
-    }
-
-    /// Saves atomically (temporary file + rename). Out-of-range values are refused.
-    pub fn save(&self, config: &Config) -> Result<(), ConfigError> {
-        let problems = config.preferences.validate();
-        if !problems.is_empty() {
-            return Err(ConfigError::Invalid(problems));
-        }
-        let text =
-            toml::to_string_pretty(config).map_err(|e| ConfigError::Io(io::Error::other(e)))?;
-        if let Some(folder) = self.path.parent() {
-            fs::create_dir_all(folder).map_err(ConfigError::Io)?;
-        }
-        let temporary = self.path.with_extension("toml.tmp");
-        fs::write(&temporary, text).map_err(ConfigError::Io)?;
-        fs::rename(&temporary, &self.path).map_err(ConfigError::Io)
-    }
-}
-
 #[cfg(test)]
 // Tests tweak one field of a default value: clearer than struct-update syntax here.
 #[allow(clippy::field_reassign_with_default)]
 mod tests {
     use super::*;
+    use crate::adapters::TomlConfigRepository;
+    use crate::message::Message;
+    use crate::ports::ConfigRepository;
+    use std::fs;
     use std::time::Duration;
 
-    fn store() -> (tempfile::TempDir, ConfigStore) {
+    fn store() -> (tempfile::TempDir, TomlConfigRepository) {
         let dir = tempfile::tempdir().unwrap();
-        let store = ConfigStore::new(dir.path());
+        let store = TomlConfigRepository::new(dir.path());
         (dir, store)
     }
 
@@ -255,7 +192,7 @@ mod tests {
         config.roots.exclusions.push("**/vendor".into());
         store.save(&config).unwrap();
 
-        let (loaded, warnings) = ConfigStore::new(store.path().parent().unwrap()).load();
+        let (loaded, warnings) = TomlConfigRepository::new(store.path().parent().unwrap()).load();
         assert!(warnings.is_empty());
         assert_eq!(loaded, config);
     }
@@ -302,7 +239,7 @@ mod tests {
     #[test]
     fn saving_creates_the_folder_and_leaves_no_temporary_file() {
         let dir = tempfile::tempdir().unwrap();
-        let store = ConfigStore::new(&dir.path().join("novo"));
+        let store = TomlConfigRepository::new(&dir.path().join("novo"));
         store.save(&Config::default()).unwrap();
         assert!(store.path().exists());
         assert!(!store.path().with_extension("toml.tmp").exists());

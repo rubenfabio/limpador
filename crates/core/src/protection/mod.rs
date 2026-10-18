@@ -88,8 +88,10 @@ pub fn set_pinned(project_root: &Path, pinned: bool, rules: &mut Protections) ->
 mod tests {
     use super::*;
     use crate::activity::{ActivityRules, ProjectState, state};
-    use crate::config::{Config, ConfigStore};
+    use crate::adapters::TomlConfigRepository;
+    use crate::config::Config;
     use crate::item::{ItemDraft, Nature, Risk};
+    use crate::ports::ConfigRepository;
     use crate::projects::{Project, ProjectGit};
     use crate::ranking::{RankedItem, rank};
     use crate::risk::assess;
@@ -211,7 +213,7 @@ mod tests {
     #[test]
     fn t02_04_ca4_protect_this_takes_effect_now_and_is_saved() {
         let dir = tempfile::tempdir().unwrap();
-        let store = ConfigStore::new(dir.path());
+        let store = TomlConfigRepository::new(dir.path());
         let mut config = Config::default();
         let target = volume("meu-banco");
         assert!(protection_for(&target, &config.protections).is_none());

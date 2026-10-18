@@ -541,7 +541,7 @@ mod tests {
         let sink = Arc::clone(&progress);
         let ctx = AnalysisContext::new(
             vec![],
-            Arc::new(crate::ports::SystemClock),
+            Arc::new(crate::adapters::SystemClock),
             commands.clone(),
             StopSignal::new(None),
             Arc::new(move |p| sink.lock().unwrap().push((p.done, p.total))),

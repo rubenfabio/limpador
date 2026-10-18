@@ -1,16 +1,9 @@
-//! Boundaries between the core and the outside world (ADR-0004).
-//!
-//! Collectors never touch the clock or spawn processes directly: they receive these
-//! traits, so tests can swap in the fakes from `limpador-testkit`.
+//! Adapters to the real operating system: clock and processes.
 
+use crate::ports::{Clock, CommandOutput, CommandRunner};
 use std::io;
 use std::process::Command;
 use std::time::SystemTime;
-
-/// Source of the current time.
-pub trait Clock: Send + Sync {
-    fn now(&self) -> SystemTime;
-}
 
 /// The real system clock.
 #[derive(Debug, Default, Clone, Copy)]
@@ -20,25 +13,6 @@ impl Clock for SystemClock {
     fn now(&self) -> SystemTime {
         SystemTime::now()
     }
-}
-
-/// Result of running an external command such as `git` or `docker`.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CommandOutput {
-    pub status: i32,
-    pub stdout: String,
-    pub stderr: String,
-}
-
-impl CommandOutput {
-    pub fn success(&self) -> bool {
-        self.status == 0
-    }
-}
-
-/// Runs external programs. Implementations must not use a shell.
-pub trait CommandRunner: Send + Sync {
-    fn run(&self, program: &str, args: &[&str]) -> io::Result<CommandOutput>;
 }
 
 /// Variables that point git at a specific repository or index. Git exports them to hooks,

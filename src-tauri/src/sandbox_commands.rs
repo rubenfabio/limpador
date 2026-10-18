@@ -2,7 +2,8 @@
 //! files the e2e scenario writes, so a test never depends on (or touches) the real Docker.
 //! `git` stays real: the fake machine's repositories are real repositories.
 
-use limpador_core::ports::{CommandOutput, CommandRunner, SystemCommandRunner};
+use limpador_core::adapters::SystemCommandRunner;
+use limpador_core::ports::{CommandOutput, CommandRunner};
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};

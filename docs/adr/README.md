@@ -34,9 +34,10 @@ Cada arquivo registra **uma** decisão: o contexto, o que foi decidido, as alter
 | [0018](0018-formato-de-persistencia.md) | Configurações em TOML e histórico em SQLite | Aceita | 2026-10-17 |
 | [0019](0019-i18n-propria-com-intl.md) | Tradução da interface com solução própria sobre Intl | Aceita | 2026-10-17 |
 | [0020](0020-navegacao-estado-e-espaco-em-disco.md) | TanStack Router e Query na interface; fs4 para espaço em disco | Aceita | 2026-10-17 |
+| [0021](0021-sqlite-com-rusqlite.md) | SQLite com rusqlite (bundled) para histórico e quarentena | Aceita | 2026-10-18 |
+| [0022](0022-apis-do-windows-via-windows-sys.md) | APIs do Windows via windows-sys: hardlinks e arquivo em uso | Aceita | 2026-10-18 |
+| [0023](0023-portas-e-adaptadores.md) | Portas e adaptadores no núcleo (Adapter e Repository) | Aceita | 2026-10-18 |
 
 ## Decisões em aberto (viram ADR quando a tarefa chegar)
 
-- Biblioteca SQLite e esquema do histórico (T-09.04 / T-11.01).
 - Método de compactação de discos virtuais por edição do Windows (T-03.07).
-- Como detectar "arquivo em uso" no Windows (T-04.01, T-09.02).

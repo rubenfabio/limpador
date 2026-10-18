@@ -186,6 +186,7 @@ fn excluded(item: &Item, exclusions: &[String]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::adapters::SystemCommandRunner;
     use crate::collector::{
         AnalysisContext, CleanOutcome, Collector, CollectorDescriptor, CollectorError, Detection,
         KindSpec, Registry, Revalidation,
@@ -193,7 +194,6 @@ mod tests {
     use crate::config::Protections;
     use crate::engine::EngineConfig;
     use crate::item::{Category, ItemDraft, Nature, Risk};
-    use crate::ports::SystemCommandRunner;
     use crate::risk::Destination;
     use limpador_testkit::{FakeMachine, ProjectSpec};
     use std::sync::Mutex;

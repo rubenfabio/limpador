@@ -6,9 +6,10 @@ pub mod sandbox_commands;
 pub mod view;
 
 use app_state::{AppState, Choices, Paths, Settings};
+use limpador_core::adapters::SystemCommandRunner;
 use limpador_core::message::Message;
 use limpador_core::onboarding::RootSuggestion;
-use limpador_core::ports::{CommandRunner, SystemCommandRunner};
+use limpador_core::ports::CommandRunner;
 use sandbox::{SANDBOX_ENV, SandboxDecision};
 use sandbox_commands::SandboxCommands;
 use std::path::PathBuf;

@@ -2,16 +2,17 @@
 //! Kept free of Tauri types so it can be tested directly.
 
 use crate::view::{AnalysisView, DriveView, ItemsEvent, analysis_view, items_event};
+use limpador_core::adapters::{SystemClock, TomlConfigRepository};
 use limpador_core::analysis::Analyzer;
 use limpador_core::collector::Registry;
 use limpador_core::collectors::docker::{DockerCollector, DockerSettings, start_desktop};
 use limpador_core::collectors::wsl_disks::{WslDisksCollector, docker_data_disk};
-use limpador_core::config::{Config, ConfigStore};
+use limpador_core::config::Config;
 use limpador_core::disks::drives;
 use limpador_core::engine::{Engine, EngineConfig, EventFn};
 use limpador_core::message::Message;
 use limpador_core::onboarding::{self, OnboardingChoices, RootSuggestion};
-use limpador_core::ports::{CommandRunner, SystemClock};
+use limpador_core::ports::{CommandRunner, ConfigRepository};
 use limpador_core::roots::{RootError, add_root};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -72,7 +73,7 @@ pub type ItemsFn = Arc<dyn Fn(ItemsEvent) + Send + Sync>;
 
 pub struct AppState {
     paths: Paths,
-    store: ConfigStore,
+    store: Box<dyn ConfigRepository>,
     config: Mutex<Config>,
     /// Problems found while loading the configuration (shown once in the UI).
     pub load_warnings: Vec<Message>,
@@ -84,7 +85,8 @@ pub struct AppState {
 impl AppState {
     /// `commands` runs git, docker and wsl: the real ones, or the fake machine's in sandbox.
     pub fn load(paths: Paths, commands: Arc<dyn CommandRunner>) -> Self {
-        let store = ConfigStore::new(&paths.config_dir);
+        let store: Box<dyn ConfigRepository> =
+            Box::new(TomlConfigRepository::new(&paths.config_dir));
         let (config, load_warnings) = store.load();
         let engine = Engine::new(registry(&config, &paths, &commands), engine_config(&config));
         Self {

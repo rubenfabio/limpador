@@ -45,8 +45,9 @@ As decisões técnicas e de arquitetura estão em [`docs/adr/`](docs/adr/README.
 - **Tauri 2**: núcleo em **Rust** e interface em **React + TypeScript** ([ADR-0002](docs/adr/0002-tauri-como-stack-desktop.md)).
 - **Núcleo independente da interface**, reutilizado por CLI e MCP na Fase 2 ([ADR-0003](docs/adr/0003-nucleo-independente-da-interface.md)).
 - **Coletores plugáveis** com dependências injetadas: sistema de arquivos, comandos `git`/`docker`/`wsl`, GitHub e relógio ([ADR-0004](docs/adr/0004-coletores-plugaveis.md)).
+- **Portas e adaptadores**: traits em `crates/core/src/ports/` (inclusive os Repositories da persistência) e implementações em `crates/core/src/adapters/`, nomeadas pela tecnologia (`TomlConfigRepository`, `WindowsPlatform`), nunca `Impl` ([ADR-0023](docs/adr/0023-portas-e-adaptadores.md)). `unsafe` só no adaptador do Windows ([ADR-0022](docs/adr/0022-apis-do-windows-via-windows-sys.md)).
 - **Catálogo de locais** declarativo, sem caminhos de terceiros fixos no código ([ADR-0005](docs/adr/0005-catalogo-de-locais-orientado-a-dados.md)).
-- **Persistência apenas local**; o formato ainda será decidido ([ADR-0010](docs/adr/0010-persistencia-local.md)).
+- **Persistência apenas local**: configurações em TOML, histórico e quarentena em SQLite com `rusqlite` ([ADR-0018](docs/adr/0018-formato-de-persistencia.md), [ADR-0021](docs/adr/0021-sqlite-com-rusqlite.md)).
 - **Textos por chave de tradução**, inclusive os motivos gerados pelo núcleo ([ADR-0014](docs/adr/0014-textos-por-chave-de-traducao.md)).
 - **Estrutura e ferramentas**: `crates/core` (núcleo), `crates/testkit` (máquina falsa, só testes), `src-tauri` (casca), `ui/` (interface), `e2e-app/` (e2e do app real), `tools/` (verificações); pnpm, Biome, rustfmt e clippy ([ADR-0016](docs/adr/0016-estrutura-do-repositorio-e-ferramentas.md)).
 

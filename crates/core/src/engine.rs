@@ -95,6 +95,8 @@ struct State {
     finished: Option<Arc<AnalysisResult>>,
     /// Last analysis that was not cancelled.
     last: Option<Arc<AnalysisResult>>,
+    /// Callers waiting for the running analysis instead of starting their own.
+    waiting: usize,
 }
 
 pub struct Engine {
@@ -120,9 +122,11 @@ impl Engine {
             let mut state = self.state.lock().unwrap();
             if state.running.is_some() {
                 let generation = state.generation;
+                state.waiting += 1;
                 while state.generation == generation {
                     state = self.changed.wait(state).unwrap();
                 }
+                state.waiting -= 1;
                 return Arc::clone(state.finished.as_ref().expect("finished analysis"));
             }
             let stop = StopSignal::new(None);
@@ -152,6 +156,11 @@ impl Engine {
 
     pub fn is_running(&self) -> bool {
         self.state.lock().unwrap().running.is_some()
+    }
+
+    /// How many callers are waiting for the running analysis.
+    pub fn waiting(&self) -> usize {
+        self.state.lock().unwrap().waiting
     }
 
     /// Last complete (not cancelled) analysis; a cancelled one never replaces it.
@@ -496,12 +505,15 @@ mod tests {
             let engine = Arc::clone(&engine);
             thread::spawn(move || engine.analyze(&inputs(), quiet()))
         };
-        thread::sleep(Duration::from_millis(50));
+        while engine.waiting() == 0 {
+            thread::sleep(Duration::from_millis(1));
+        }
         *gate.0.lock().unwrap() = true;
         gate.1.notify_all();
 
         let (a, b) = (first.join().unwrap(), second.join().unwrap());
         assert!(Arc::ptr_eq(&a, &b), "both callers get the same analysis");
+        assert_eq!(engine.waiting(), 0);
         assert_eq!(collector.detections.load(Ordering::SeqCst), 1);
     }
 
@@ -651,7 +663,12 @@ mod tests {
             Behaving::new(id, move |_, _| {
                 let now = running.fetch_add(1, Ordering::SeqCst) + 1;
                 peak.fetch_max(now, Ordering::SeqCst);
-                thread::sleep(Duration::from_millis(40));
+                // Stay until two ran together, so a busy machine cannot hide the parallelism.
+                let deadline = Instant::now() + Duration::from_secs(5);
+                while peak.load(Ordering::SeqCst) < 2 && Instant::now() < deadline {
+                    thread::sleep(Duration::from_millis(1));
+                }
+                thread::sleep(Duration::from_millis(5));
                 running.fetch_sub(1, Ordering::SeqCst);
                 Ok(())
             })

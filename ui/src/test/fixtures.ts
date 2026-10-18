@@ -32,6 +32,7 @@ export function item(overrides: Partial<ItemView> & { name: string }): ItemView 
     projectState: null,
     lastActivity: null,
     contains: [],
+    parts: [],
     ...overrides,
   };
 }

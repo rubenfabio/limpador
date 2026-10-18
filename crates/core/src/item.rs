@@ -116,6 +116,9 @@ pub struct Item {
     pub side_effects: Vec<Message>,
     pub block_reason: Option<Message>,
     pub contains: Vec<ItemId>,
+    /// Folders that make up the item when it groups several (e.g. every `node_modules`
+    /// of a monorepo). Empty when the resource alone is the item.
+    pub parts: Vec<PathBuf>,
     pub alerts: Vec<Message>,
     pub signals: Vec<Signal>,
 }
@@ -173,6 +176,7 @@ impl ItemDraft {
                 side_effects: Vec::new(),
                 block_reason: None,
                 contains: Vec::new(),
+                parts: Vec::new(),
                 alerts: Vec::new(),
                 signals: Vec::new(),
             },
@@ -228,6 +232,11 @@ impl ItemDraft {
 
     pub fn contains(mut self, child: ItemId) -> Self {
         self.item.contains.push(child);
+        self
+    }
+
+    pub fn part(mut self, folder: impl Into<PathBuf>) -> Self {
+        self.item.parts.push(folder.into());
         self
     }
 

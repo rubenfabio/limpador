@@ -94,3 +94,35 @@ fn read_only_collector_passes_the_guard() {
 
     machine.assert_unchanged_since(&before);
 }
+
+#[test]
+fn node_modules_analysis_and_revalidation_change_nothing() {
+    use limpador_core::adapters::native_platform;
+    use limpador_core::collectors::node_modules::NodeModulesCollector;
+    use limpador_core::projects::{DiscoveryOptions, discover};
+
+    let machine = FakeMachine::new().unwrap();
+    let api = machine
+        .project(&ProjectSpec::node("api").inactive_days(40))
+        .unwrap();
+    fs::create_dir_all(api.join("node_modules").join("react")).unwrap();
+    fs::write(api.join("node_modules").join("react").join("index.js"), "x").unwrap();
+    let before = machine.snapshot();
+
+    let collector = NodeModulesCollector::new(native_platform());
+    let discovery = discover(&[machine.roots()], &DiscoveryOptions::default());
+    let ctx = AnalysisContext::new(
+        vec![machine.roots()],
+        Arc::new(limpador_core::adapters::SystemClock),
+        Arc::new(SystemCommandRunner),
+        StopSignal::new(None),
+        Arc::new(|_| {}),
+    )
+    .with_discovery(Arc::new(discovery));
+    let mut items = vec![];
+    collector.analyze(&ctx, &mut |i| items.push(i)).unwrap();
+    assert_eq!(items.len(), 1);
+    collector.revalidate(&ctx, &items[0]);
+
+    machine.assert_unchanged_since(&before);
+}

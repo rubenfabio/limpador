@@ -21,6 +21,7 @@ pub mod protection;
 pub mod ranking;
 pub mod risk;
 pub mod roots;
+pub mod tree;
 
 /// Version of the core library.
 pub fn version() -> &'static str {

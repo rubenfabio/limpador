@@ -53,6 +53,8 @@ export interface ItemView {
   projectState: ProjectState | null;
   lastActivity: number | null;
   contains: string[];
+  /** Folders the item groups (e.g. every node_modules of a monorepo). */
+  parts: string[];
 }
 
 export interface CollectorView {

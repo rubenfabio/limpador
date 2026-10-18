@@ -2,10 +2,11 @@
 //! Kept free of Tauri types so it can be tested directly.
 
 use crate::view::{AnalysisView, DriveView, ItemsEvent, analysis_view, items_event};
-use limpador_core::adapters::{SystemClock, TomlConfigRepository};
+use limpador_core::adapters::{SystemClock, TomlConfigRepository, native_platform};
 use limpador_core::analysis::Analyzer;
 use limpador_core::collector::Registry;
 use limpador_core::collectors::docker::{DockerCollector, DockerSettings, start_desktop};
+use limpador_core::collectors::node_modules::NodeModulesCollector;
 use limpador_core::collectors::wsl_disks::{WslDisksCollector, docker_data_disk};
 use limpador_core::config::Config;
 use limpador_core::disks::drives;
@@ -211,6 +212,7 @@ pub fn registry(config: &Config, paths: &Paths, commands: &Arc<dyn CommandRunner
         Arc::clone(commands),
         docker_data_disk(&paths.local_app_data),
     );
+    let node_modules = NodeModulesCollector::new(native_platform());
     let mut registry = Registry::default();
     registry
         .register(Arc::new(docker))
@@ -218,6 +220,9 @@ pub fn registry(config: &Config, paths: &Paths, commands: &Arc<dyn CommandRunner
     registry
         .register(Arc::new(disks))
         .expect("wsl-disks collector registers");
+    registry
+        .register(Arc::new(node_modules))
+        .expect("node-modules collector registers");
     registry
 }
 
@@ -373,7 +378,11 @@ mod tests {
                 .iter()
                 .map(|c| (c.id.as_str(), c.state))
                 .collect::<Vec<_>>(),
-            vec![("docker", "not_installed"), ("wsl-disks", "not_installed")],
+            vec![
+                ("docker", "not_installed"),
+                ("wsl-disks", "not_installed"),
+                ("node-modules", "done")
+            ],
             "the fake machine has no Docker or WSL unless a scenario scripts them"
         );
     }
@@ -404,6 +413,9 @@ mod tests {
             })
             .unwrap();
         assert_eq!(state.last_analysis(), None);
+        let modules = dir.path().join("Projetos").join("api").join("node_modules");
+        fs::create_dir_all(modules.join("react")).unwrap();
+        fs::write(modules.join("react").join("index.js"), "x".repeat(2_000)).unwrap();
 
         let events = Arc::new(Mutex::new(Vec::new()));
         let sink = Arc::clone(&events);
@@ -431,8 +443,17 @@ mod tests {
         batches.sort();
         assert_eq!(
             batches,
-            vec!["docker", "wsl-disks"],
+            vec!["docker", "node-modules", "wsl-disks"],
             "one batch per finished collector"
+        );
+        let item = &view.space[0];
+        assert_eq!(
+            (item.name.as_str(), item.freeable_size, item.parts.clone()),
+            (
+                "api · node_modules",
+                2_000,
+                vec![modules.display().to_string()]
+            )
         );
         assert_eq!(state.last_analysis(), Some(view));
         state.cancel_analysis(); // nothing running: no effect
@@ -450,7 +471,7 @@ mod tests {
     }
 
     #[test]
-    fn the_app_runs_the_docker_and_virtual_disk_collectors() {
+    fn the_app_runs_every_collector_of_the_mvp_so_far() {
         let dir = tempfile::tempdir().unwrap();
         let commands: Arc<dyn CommandRunner> = Arc::new(SandboxCommands::new(dir.path()));
         let registry = registry(&Config::default(), &Paths::sandbox(dir.path()), &commands);
@@ -459,7 +480,7 @@ mod tests {
             .iter()
             .map(|c| c.descriptor().id)
             .collect();
-        assert_eq!(ids, vec!["docker", "wsl-disks"]);
+        assert_eq!(ids, vec!["docker", "wsl-disks", "node-modules"]);
     }
 
     #[test]

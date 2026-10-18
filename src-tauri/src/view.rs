@@ -135,6 +135,8 @@ pub struct ItemView {
     /// Milliseconds since the Unix epoch.
     pub last_activity: Option<u64>,
     pub contains: Vec<String>,
+    /// Folders the item groups (e.g. every `node_modules` of a monorepo).
+    pub parts: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -238,6 +240,7 @@ pub fn item_view(entry: &RankedItem) -> ItemView {
             .iter()
             .map(|c| c.as_str().to_owned())
             .collect(),
+        parts: item.parts.iter().map(|p| p.display().to_string()).collect(),
     }
 }
 
@@ -526,8 +529,10 @@ mod tests {
             .contains
             .push(ItemId::new("t", "x", &Resource::Name("n".into())));
         nested.item.action = CleanAction::Compact;
+        nested.item.parts = vec![PathBuf::from(r"C:\p\w\node_modules")];
         let view = item_view(&nested);
         assert_eq!((view.contains.len(), view.action), (1, "compact"));
+        assert_eq!(view.parts, vec![r"C:\p\w\node_modules"]);
     }
 
     #[test]

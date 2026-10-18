@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { formatBytes, formatDateTime, formatRelative, setLocale, t, translate } from "./index";
+import { ptBR } from "./pt-BR";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -57,6 +58,26 @@ describe("textos e tradução (T-08.07)", () => {
   it("only languages with a dictionary can be selected", () => {
     expect(() => setLocale("xx")).toThrow("Idioma sem dicionário: xx");
     setLocale("pt-BR");
+  });
+
+  it("every message the core can send has a pt-BR text", () => {
+    const repo = join(import.meta.dirname, "..", "..", "..");
+    const rust = ["crates/core/src", "src-tauri/src"].flatMap((folder) =>
+      readdirSync(join(repo, folder), { recursive: true, withFileTypes: true })
+        .filter((e) => e.isFile() && e.name.endsWith(".rs") && !e.name.endsWith("_tests.rs"))
+        .map(
+          (e) => readFileSync(join(e.parentPath, e.name), "utf8").split("#[cfg(test)]")[0] ?? "",
+        ),
+    );
+    const keys = rust.flatMap((code) => [
+      ...[...code.matchAll(/Message::new\("([\w.-]+)"\)/g)].map((m) => m[1]),
+      ...[...code.matchAll(/pub const ID: &str = "([\w-]+)";/g)].map((m) => `collector.${m[1]}`),
+      // Keys chosen in a match before the message is built, e.g. "protection.branch".
+      ...[...code.matchAll(/=> \(&[\w.]+, "([\w.-]+)"\)/g)].map((m) => m[1]),
+    ]);
+    expect(keys.length).toBeGreaterThan(20);
+    const missing = [...new Set(keys)].filter((key) => key && !(key in ptBR));
+    expect(missing).toEqual([]);
   });
 
   it("t08_07_ca3_no_visible_text_outside_the_translation_files", () => {

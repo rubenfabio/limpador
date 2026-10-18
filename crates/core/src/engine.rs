@@ -9,6 +9,7 @@ use crate::collector::{
 use crate::item::Item;
 use crate::message::Message;
 use crate::ports::{Clock, CommandRunner};
+use crate::projects::Discovery;
 use std::collections::VecDeque;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::PathBuf;
@@ -73,6 +74,7 @@ pub struct AnalysisResult {
 #[derive(Clone)]
 pub struct AnalysisInputs {
     pub roots: Vec<PathBuf>,
+    pub discovery: Arc<Discovery>,
     pub clock: Arc<dyn Clock>,
     pub commands: Arc<dyn CommandRunner>,
     /// Receives each collector's items as soon as it finishes, before the others (T-08.06).
@@ -228,7 +230,8 @@ impl Engine {
             Arc::clone(&inputs.commands),
             own_stop.clone(),
             Arc::new(move |p| progress_events(&progress_id, &CollectorState::Analyzing(p))),
-        );
+        )
+        .with_discovery(Arc::clone(&inputs.discovery));
 
         let mut found = Vec::new();
         let mut rejected = 0;
@@ -306,6 +309,7 @@ mod tests {
         AnalysisInputs {
             on_items: None,
             roots: vec![],
+            discovery: Arc::default(),
             clock: Arc::new(SystemClock),
             commands: Arc::new(NoCommands),
         }

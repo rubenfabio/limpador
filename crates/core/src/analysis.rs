@@ -85,12 +85,13 @@ impl Analyzer {
                 }
             })
             .collect();
+        let discovery = Arc::new(discovery);
         let ranker = Arc::new(Ranker {
             states: projects
                 .iter()
                 .map(|s| (path_key(&s.project.root), s.state))
                 .collect(),
-            discovery,
+            discovery: Arc::clone(&discovery),
             exclusions: config.roots.exclusions.clone(),
             protections: config.protections.clone(),
         });
@@ -99,6 +100,7 @@ impl Analyzer {
         let result = self.engine.analyze(
             &AnalysisInputs {
                 roots,
+                discovery,
                 clock: Arc::clone(&self.clock),
                 commands: Arc::clone(&self.commands),
                 on_items: Some(Arc::new(move |id, items| {
@@ -131,7 +133,7 @@ impl Analyzer {
 
 /// What it takes to place one item: its project, that project's activity, its protection.
 struct Ranker {
-    discovery: Discovery,
+    discovery: Arc<Discovery>,
     states: HashMap<String, ProjectState>,
     exclusions: Vec<String>,
     protections: Protections,

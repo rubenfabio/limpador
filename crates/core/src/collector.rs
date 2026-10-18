@@ -4,6 +4,7 @@
 use crate::item::{Category, Item, Nature};
 use crate::message::Message;
 use crate::ports::{Clock, CommandRunner};
+use crate::projects::Discovery;
 use crate::risk::Destination;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -122,6 +123,8 @@ pub type ProgressFn = Arc<dyn Fn(Progress) + Send + Sync>;
 #[derive(Clone)]
 pub struct AnalysisContext {
     pub roots: Vec<PathBuf>,
+    /// Projects found under the roots (T-02.03), shared by every collector.
+    pub discovery: Arc<Discovery>,
     pub clock: Arc<dyn Clock>,
     pub commands: Arc<dyn CommandRunner>,
     pub stop: StopSignal,
@@ -138,11 +141,17 @@ impl AnalysisContext {
     ) -> Self {
         Self {
             roots,
+            discovery: Arc::new(Discovery::default()),
             clock,
             commands,
             stop,
             progress,
         }
+    }
+
+    pub fn with_discovery(mut self, discovery: Arc<Discovery>) -> Self {
+        self.discovery = discovery;
+        self
     }
 
     pub fn report(&self, done: u64, total: Option<u64>) {

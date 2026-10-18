@@ -2,7 +2,7 @@
 
 mod preferences;
 
-pub use preferences::{Frequency, OutOfRange, Preferences, Schedule};
+pub use preferences::{DEFAULT_BUILD_FOLDERS, Frequency, OutOfRange, Preferences, Schedule};
 
 use serde::{Deserialize, Serialize};
 use std::io;

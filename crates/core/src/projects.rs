@@ -42,6 +42,58 @@ pub(crate) const NOT_SEARCHED: &[&str] = &[
     "build",
 ];
 
+/// Folders inside the project at `root` whose path relative to it (with `/`) satisfies
+/// `wanted`. Never enters another project (`others`), a link or junction, a folder that
+/// matched, or a dependency/build folder; stops `max_depth` levels below `root`.
+pub fn find_folders(
+    root: &Path,
+    others: &[&Path],
+    max_depth: u32,
+    wanted: &dyn Fn(&str) -> bool,
+) -> Vec<PathBuf> {
+    let mut found = Vec::new();
+    let mut pending = vec![(root.to_path_buf(), String::new(), 0)];
+    while let Some((dir, relative, depth)) = pending.pop() {
+        let Ok(entries) = fs::read_dir(&dir) else {
+            continue;
+        };
+        for entry in entries.filter_map(Result::ok) {
+            let is_dir = entry
+                .file_type()
+                .is_ok_and(|k| k.is_dir() && !k.is_symlink());
+            if !is_dir {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().into_owned();
+            let path = entry.path();
+            let inner = if relative.is_empty() {
+                name.clone()
+            } else {
+                format!("{relative}/{name}")
+            };
+            if wanted(&inner) {
+                found.push(path);
+            } else if depth < max_depth
+                && !NOT_SEARCHED.contains(&name.as_str())
+                && !others.contains(&path.as_path())
+            {
+                pending.push((path, inner, depth + 1));
+            }
+        }
+    }
+    found.sort();
+    found
+}
+
+/// Whether `relative` (e.g. `packages/web/.angular/cache`) ends with the folder `pattern`
+/// (e.g. `.angular/cache`), compared by whole names.
+pub fn ends_with_folder(relative: &str, pattern: &str) -> bool {
+    relative == pattern
+        || relative
+            .strip_suffix(pattern)
+            .is_some_and(|start| start.ends_with('/'))
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProjectGit {
     None,
@@ -146,6 +198,11 @@ fn visit(
             visit(&entry.path(), depth + 1, inside, options, found);
         }
     }
+}
+
+/// The project at `dir` as discovery would see it: name and git state (no marker check).
+pub fn project_at(dir: &Path) -> Project {
+    new_project(dir, git_kind(dir).unwrap_or(ProjectGit::None))
 }
 
 fn new_project(dir: &Path, git: ProjectGit) -> Project {

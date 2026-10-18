@@ -83,6 +83,7 @@ export const ptBR: Dictionary = {
   "collector.docker": "Docker",
   "collector.wsl-disks": "Discos virtuais (WSL e Docker)",
   "collector.node-modules": "Dependências (node_modules)",
+  "collector.build-outputs": "Saídas de build",
   "collector_state.waiting": "aguardando",
   "collector_state.analyzing": "analisando",
   "collector_state.done": "concluído",
@@ -170,7 +171,12 @@ export const ptBR: Dictionary = {
     one: "Dependências instaladas do projeto ({count} pasta node_modules).",
     other: "Dependências instaladas do projeto ({count} pastas node_modules).",
   },
+  "reason.build_outputs": {
+    one: "Saída de build ignorada pelo git ({count} pasta).",
+    other: "Saídas de build ignoradas pelo git ({count} pastas).",
+  },
   "recreate.run_command": "Rode {command} no projeto.",
+  "recreate.next_build": "Refeita no próximo build ou dev.",
   "alert.versions_may_differ":
     "O projeto não tem arquivo de lock: reinstalar pode trazer versões diferentes.",
   "signal.file_in_use": "{file} está aberto por {process}.",

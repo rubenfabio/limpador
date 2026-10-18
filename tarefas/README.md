@@ -69,7 +69,7 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 | ID | Tarefa | Depende de | Status |
 |---|---|---|---|
 | T-04.01 | [node_modules](F04-dependencias-e-builds/T-04.01-node-modules.md) | T-02.03, T-01.06 | concluída |
-| T-04.02 | [Saídas de build](F04-dependencias-e-builds/T-04.02-saidas-de-build.md) | T-02.03 | pendente |
+| T-04.02 | [Saídas de build](F04-dependencias-e-builds/T-04.02-saidas-de-build.md) | T-02.03 | concluída |
 | T-04.03 | [Caches de gerenciadores JS](F04-dependencias-e-builds/T-04.03-caches-de-gerenciadores-js.md) | T-01.04 | pendente |
 | T-04.04 | [Python](F04-dependencias-e-builds/T-04.04-python.md) | T-02.03, T-01.06 | pendente |
 | T-04.05 | [Outros ecossistemas](F04-dependencias-e-builds/T-04.05-outros-ecossistemas.md) | T-04.02 | pendente |

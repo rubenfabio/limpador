@@ -53,7 +53,27 @@ pub struct Preferences {
     pub history_retention_days: u32,
     pub collector_timeout_minutes: u32,
     pub scan_depth: u32,
+    /// Build output folders recognized in projects (T-04.02); `a/b` matches nested ones.
+    pub build_folders: Vec<String>,
 }
+
+/// Build outputs recognized by default (T-04.02).
+pub const DEFAULT_BUILD_FOLDERS: &[&str] = &[
+    ".next",
+    ".nuxt",
+    ".svelte-kit",
+    ".astro",
+    ".output",
+    "dist",
+    "build",
+    "out",
+    ".turbo",
+    ".parcel-cache",
+    ".vite",
+    ".angular/cache",
+    "coverage",
+    "storybook-static",
+];
 
 impl Default for Preferences {
     fn default() -> Self {
@@ -76,6 +96,10 @@ impl Default for Preferences {
             history_retention_days: 365,
             collector_timeout_minutes: 5,
             scan_depth: 6,
+            build_folders: DEFAULT_BUILD_FOLDERS
+                .iter()
+                .map(|f| (*f).to_owned())
+                .collect(),
         }
     }
 }

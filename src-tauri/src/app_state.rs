@@ -5,6 +5,7 @@ use crate::view::{AnalysisView, DriveView, ItemsEvent, analysis_view, items_even
 use limpador_core::adapters::{SystemClock, TomlConfigRepository, native_platform};
 use limpador_core::analysis::Analyzer;
 use limpador_core::collector::Registry;
+use limpador_core::collectors::build_outputs::BuildOutputsCollector;
 use limpador_core::collectors::docker::{DockerCollector, DockerSettings, start_desktop};
 use limpador_core::collectors::node_modules::NodeModulesCollector;
 use limpador_core::collectors::wsl_disks::{WslDisksCollector, docker_data_disk};
@@ -213,6 +214,11 @@ pub fn registry(config: &Config, paths: &Paths, commands: &Arc<dyn CommandRunner
         docker_data_disk(&paths.local_app_data),
     );
     let node_modules = NodeModulesCollector::new(native_platform());
+    let builds = BuildOutputsCollector::new(
+        Arc::clone(commands),
+        native_platform(),
+        config.preferences.build_folders.clone(),
+    );
     let mut registry = Registry::default();
     registry
         .register(Arc::new(docker))
@@ -223,6 +229,9 @@ pub fn registry(config: &Config, paths: &Paths, commands: &Arc<dyn CommandRunner
     registry
         .register(Arc::new(node_modules))
         .expect("node-modules collector registers");
+    registry
+        .register(Arc::new(builds))
+        .expect("build-outputs collector registers");
     registry
 }
 
@@ -381,7 +390,8 @@ mod tests {
             vec![
                 ("docker", "not_installed"),
                 ("wsl-disks", "not_installed"),
-                ("node-modules", "done")
+                ("node-modules", "done"),
+                ("build-outputs", "done")
             ],
             "the fake machine has no Docker or WSL unless a scenario scripts them"
         );
@@ -443,7 +453,7 @@ mod tests {
         batches.sort();
         assert_eq!(
             batches,
-            vec!["docker", "node-modules", "wsl-disks"],
+            vec!["build-outputs", "docker", "node-modules", "wsl-disks"],
             "one batch per finished collector"
         );
         let item = &view.space[0];
@@ -480,7 +490,10 @@ mod tests {
             .iter()
             .map(|c| c.descriptor().id)
             .collect();
-        assert_eq!(ids, vec!["docker", "wsl-disks", "node-modules"]);
+        assert_eq!(
+            ids,
+            vec!["docker", "wsl-disks", "node-modules", "build-outputs"]
+        );
     }
 
     #[test]

@@ -56,12 +56,12 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 
 | ID | Tarefa | Depende de | Status |
 |---|---|---|---|
-| T-03.01 | [Detecção do Docker e do WSL](F03-docker-e-discos-virtuais/T-03.01-deteccao-do-docker.md) | T-01.04 | pendente |
-| T-03.02 | [Imagens](F03-docker-e-discos-virtuais/T-03.02-imagens.md) | T-03.01, T-01.06 | pendente |
-| T-03.03 | [Containers parados](F03-docker-e-discos-virtuais/T-03.03-containers-parados.md) | T-03.01, T-01.06 | pendente |
+| T-03.01 | [Detecção do Docker e do WSL](F03-docker-e-discos-virtuais/T-03.01-deteccao-do-docker.md) | T-01.04 | concluída |
+| T-03.02 | [Imagens](F03-docker-e-discos-virtuais/T-03.02-imagens.md) | T-03.01, T-01.06 | concluída |
+| T-03.03 | [Containers parados](F03-docker-e-discos-virtuais/T-03.03-containers-parados.md) | T-03.01, T-01.06 | em andamento |
 | T-03.04 | [Volumes órfãos](F03-docker-e-discos-virtuais/T-03.04-volumes.md) | T-03.01, T-09.04 | pendente |
-| T-03.05 | [Cache de build e redes](F03-docker-e-discos-virtuais/T-03.05-cache-de-build-e-redes.md) | T-03.01 | pendente |
-| T-03.06 | [Espaço fantasma dos discos virtuais](F03-docker-e-discos-virtuais/T-03.06-espaco-fantasma-dos-discos-virtuais.md) | T-03.01 | pendente |
+| T-03.05 | [Cache de build e redes](F03-docker-e-discos-virtuais/T-03.05-cache-de-build-e-redes.md) | T-03.01 | concluída |
+| T-03.06 | [Espaço fantasma dos discos virtuais](F03-docker-e-discos-virtuais/T-03.06-espaco-fantasma-dos-discos-virtuais.md) | T-03.01 | em andamento |
 | T-03.07 | [Compactação dos discos virtuais](F03-docker-e-discos-virtuais/T-03.07-compactacao-dos-discos-virtuais.md) | T-03.06, T-09.01 | pendente |
 
 ## F04 — Dependências e builds
@@ -108,12 +108,12 @@ Uma tarefa só começa quando todas as dependências estão `concluída`. Ao con
 
 | ID | Tarefa | Depende de | Status |
 |---|---|---|---|
-| T-08.01 | [Painel principal](F08-interface/T-08.01-painel-principal.md) | T-01.05, T-08.06, T-08.07 | pendente |
-| T-08.02 | [Ranking](F08-interface/T-08.02-ranking.md) | T-01.03, T-08.01 | pendente |
+| T-08.01 | [Painel principal](F08-interface/T-08.01-painel-principal.md) | T-01.05, T-08.06, T-08.07 | em andamento |
+| T-08.02 | [Ranking](F08-interface/T-08.02-ranking.md) | T-01.03, T-08.01 | concluída |
 | T-08.03 | [Visões por projeto e categoria](F08-interface/T-08.03-visoes-por-projeto-e-categoria.md) | T-08.02 | pendente |
 | T-08.04 | [Detalhe do item](F08-interface/T-08.04-detalhe-do-item.md) | T-08.02 | pendente |
-| T-08.05 | [Seleção e resumo](F08-interface/T-08.05-selecao-e-resumo.md) | T-08.02, T-01.02 | pendente |
-| T-08.06 | [Progresso e estados](F08-interface/T-08.06-progresso-e-estados.md) | T-01.05 | pendente |
+| T-08.05 | [Seleção e resumo](F08-interface/T-08.05-selecao-e-resumo.md) | T-08.02, T-01.02 | em andamento |
+| T-08.06 | [Progresso e estados](F08-interface/T-08.06-progresso-e-estados.md) | T-01.05 | concluída |
 | T-08.07 | [Textos e tradução](F08-interface/T-08.07-textos-e-traducao.md) | — | concluída |
 
 ## F09 — Limpeza e quarentena

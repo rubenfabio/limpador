@@ -44,9 +44,16 @@ function pluralForm(forms: PluralForms, count: number): string {
   return forms[new Intl.PluralRules(locale).select(count)] ?? forms.other;
 }
 
+/** Core parameters that carry bytes; they are shown as sizes ("12,0 GB"). */
+const BYTE_PARAMS = new Set(["size", "used", "recent", "bytes", "freed"]);
+
 /** Translates a message produced by the core (reasons, alerts, "como recriar"…). */
 export function translate(message: CoreMessage): string {
-  return t(message.key, message.params);
+  const params: Params = { ...message.params };
+  for (const [name, value] of Object.entries(message.params)) {
+    if (BYTE_PARAMS.has(name) && /^\d+$/.test(value)) params[name] = formatBytes(Number(value));
+  }
+  return t(message.key, params);
 }
 
 const GB = 1024 ** 3;

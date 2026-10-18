@@ -17,6 +17,16 @@ describe("textos e tradução (T-08.07)", () => {
     expect(translate({ key: "app.version", params: { version: "0.1.0" } })).toBe("v0.1.0");
   });
 
+  it("byte parameters from the core are shown as sizes", () => {
+    expect(
+      translate({
+        key: "reason.vdisk_phantom",
+        params: { size: "19112000000", used: "524288000" },
+      }),
+    ).toBe("O arquivo ocupa 17,8 GB, mas só 500,0 MB estão em uso dentro dele.");
+    expect(translate({ key: "app.version", params: { version: "123" } })).toBe("v123");
+  });
+
   it("t08_07_ca4_plural_forms_follow_the_count", () => {
     expect(t("common.items", { count: 1 })).toBe("1 item");
     expect(t("common.items", { count: 2 })).toBe("2 itens");

@@ -23,7 +23,7 @@ test("t02_01_ca5_completing_saves_choices_and_runs_the_first_analysis", async ({
   await page.getByRole("button", { name: "Continuar" }).click();
   await page.getByRole("button", { name: "Concluir e analisar" }).click();
 
-  await expect(page.getByTestId("projects")).toHaveText("14 projetos");
+  await expect(page.getByTestId("recoverable")).toHaveText("35,0 GB");
   const calls = await ipcCalls(page);
   const saved = calls.find((c) => c.cmd === "complete_onboarding");
   expect(saved?.args).toEqual({
@@ -34,7 +34,7 @@ test("t02_01_ca5_completing_saves_choices_and_runs_the_first_analysis", async ({
     },
   });
   const order = calls.map((c) => c.cmd);
-  expect(order.indexOf("complete_onboarding")).toBeLessThan(order.indexOf("run_analysis"));
+  expect(order.indexOf("complete_onboarding")).toBeLessThan(order.indexOf("analyze"));
 });
 
 test("t02_01_ca4_skipping_leads_to_the_no_folders_state", async ({ page }) => {

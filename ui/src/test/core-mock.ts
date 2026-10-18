@@ -14,14 +14,26 @@ export const freshInstall: Settings = {
   startWithSystem: false,
 };
 
-/** Installs `responses` (a value, or a function of the arguments) and returns the calls made. */
+export const configured: Settings = {
+  ...freshInstall,
+  onboardingDone: true,
+  roots: ["C:\\Projetos"],
+};
+
+/**
+ * Installs `responses` (a value, or a function of the arguments) and returns the calls made.
+ * Events (`listen`/`emit`) are simulated too, so tests can emit analysis progress.
+ */
 export function simulateCore(responses: Record<string, unknown>): Call[] {
   const calls: Call[] = [];
-  mockIPC((cmd, args) => {
-    calls.push({ cmd, args });
-    if (!(cmd in responses)) throw new Error(`comando não simulado: ${cmd}`);
-    const response = responses[cmd];
-    return typeof response === "function" ? response(args) : response;
-  });
+  mockIPC(
+    (cmd, args) => {
+      calls.push({ cmd, args });
+      if (!(cmd in responses)) throw new Error(`comando não simulado: ${cmd}`);
+      const response = responses[cmd];
+      return typeof response === "function" ? response(args) : response;
+    },
+    { shouldMockEvents: true },
+  );
   return calls;
 }

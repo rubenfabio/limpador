@@ -75,10 +75,15 @@ pub struct AnalysisInputs {
     pub roots: Vec<PathBuf>,
     pub clock: Arc<dyn Clock>,
     pub commands: Arc<dyn CommandRunner>,
+    /// Receives each collector's items as soon as it finishes, before the others (T-08.06).
+    pub on_items: Option<ItemsFn>,
 }
 
 /// Live state changes, for the UI (T-08.06).
 pub type EventFn = Arc<dyn Fn(&str, &CollectorState) + Send + Sync>;
+
+/// Items of one collector that just finished.
+pub type ItemsFn = Arc<dyn Fn(&str, &[Item]) + Send + Sync>;
 
 #[derive(Default)]
 struct State {
@@ -271,6 +276,9 @@ impl Engine {
         if state == CollectorState::Cancelled {
             found.clear();
         }
+        if let Some(on_items) = &inputs.on_items {
+            on_items(&id, &found);
+        }
         on_event(&id, &state);
 
         let report = CollectorReport {
@@ -296,6 +304,7 @@ mod tests {
 
     fn inputs() -> AnalysisInputs {
         AnalysisInputs {
+            on_items: None,
             roots: vec![],
             clock: Arc::new(SystemClock),
             commands: Arc::new(NoCommands),
@@ -587,6 +596,46 @@ mod tests {
                 .any(|(_, s)| matches!(s, CollectorState::Analyzing(_)))
         );
         assert_eq!(events.last().unwrap().1, CollectorState::Done);
+    }
+
+    #[test]
+    fn t08_06_ca1_a_finished_collectors_items_arrive_before_the_others_finish() {
+        let fast_seen = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let seen = Arc::clone(&fast_seen);
+        let slow = Behaving::new("lento", move |_, _| {
+            let deadline = Instant::now() + Duration::from_secs(5);
+            while !seen.load(Ordering::SeqCst) && Instant::now() < deadline {
+                thread::sleep(Duration::from_millis(5));
+            }
+            Ok(())
+        });
+        let engine = engine(
+            vec![slow, Arc::new(FakeCollector::new("rapido", vec!["x"]))],
+            EngineConfig::default(),
+        );
+        let batches = Arc::new(Mutex::new(vec![]));
+        let sink = Arc::clone(&batches);
+        let flag = Arc::clone(&fast_seen);
+        let inputs = AnalysisInputs {
+            on_items: Some(Arc::new(move |id, items| {
+                if id == "rapido" && !items.is_empty() {
+                    flag.store(true, Ordering::SeqCst);
+                }
+                sink.lock().unwrap().push((id.to_owned(), items.len()));
+            })),
+            ..inputs()
+        };
+        let started = Instant::now();
+        engine.analyze(&inputs, Arc::new(|_, _| {}));
+
+        assert!(
+            started.elapsed() < Duration::from_secs(4),
+            "the slow collector saw the fast one's items while still running"
+        );
+        assert_eq!(
+            *batches.lock().unwrap(),
+            vec![("rapido".to_owned(), 1), ("lento".to_owned(), 0)]
+        );
     }
 
     #[test]

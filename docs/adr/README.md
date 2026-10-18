@@ -33,10 +33,10 @@ Cada arquivo registra **uma** decisão: o contexto, o que foi decidido, as alter
 | [0017](0017-ci-local.md) | CI local via hooks do git e tarefa agendada | Aceita | 2026-10-17 |
 | [0018](0018-formato-de-persistencia.md) | Configurações em TOML e histórico em SQLite | Aceita | 2026-10-17 |
 | [0019](0019-i18n-propria-com-intl.md) | Tradução da interface com solução própria sobre Intl | Aceita | 2026-10-17 |
+| [0020](0020-navegacao-estado-e-espaco-em-disco.md) | TanStack Router e Query na interface; fs4 para espaço em disco | Aceita | 2026-10-17 |
 
 ## Decisões em aberto (viram ADR quando a tarefa chegar)
 
 - Biblioteca SQLite e esquema do histórico (T-09.04 / T-11.01).
-- Biblioteca de estado e roteamento da interface (T-08.01).
 - Método de compactação de discos virtuais por edição do Windows (T-03.07).
 - Como detectar "arquivo em uso" no Windows (T-04.01, T-09.02).

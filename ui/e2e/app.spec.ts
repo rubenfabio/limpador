@@ -17,7 +17,7 @@ test("t00_03_ca2_test_sees_which_calls_the_interface_made", async ({ page }) => 
   await expect(page.getByRole("button", { name: "Analisar agora" })).toBeVisible();
 
   const commands = (await ipcCalls(page)).map((c) => c.cmd).sort();
-  expect(commands).toEqual(["core_version", "get_settings"]);
+  expect(commands).toEqual(["core_version", "get_settings", "last_analysis"]);
 });
 
 test("core failure keeps the interface usable", async ({ page }) => {

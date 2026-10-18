@@ -1,3 +1,4 @@
+import { typicalAnalysis } from "../../src/test/fixtures";
 import { type CoreResponses, coreError } from "./core-mock";
 
 const freshInstall = {
@@ -8,11 +9,20 @@ const freshInstall = {
 };
 const configured = { ...freshInstall, onboardingDone: true, roots: ["C:\\Projetos"] };
 
-// Reusable simulated-core responses. Analysis scenarios (typical, 10k items, collector
-// error, Docker stopped) are added by the F08 tasks that introduce those screens.
+// Reusable simulated-core responses. Screen details (10k items, collector errors, Docker
+// stopped) are covered by the Vitest screen tests; e2e keeps the journeys.
 export const scenarios = {
-  basico: { core_version: "0.1.0", get_settings: configured },
-  nucleoIndisponivel: { core_version: coreError("núcleo indisponível"), get_settings: configured },
+  basico: { core_version: "0.1.0", get_settings: configured, last_analysis: null },
+  nucleoIndisponivel: {
+    core_version: coreError("núcleo indisponível"),
+    get_settings: configured,
+    last_analysis: null,
+  },
+  analiseTipica: {
+    core_version: "0.1.0",
+    get_settings: configured,
+    last_analysis: typicalAnalysis(),
+  },
   primeiraExecucao: {
     core_version: "0.1.0",
     get_settings: freshInstall,
@@ -24,15 +34,7 @@ export const scenarios = {
     validate_root: null,
     complete_onboarding: { ...configured, roots: ["C:\\Projetos", "D:\\Trabalho"] },
     skip_onboarding: { ...freshInstall, onboardingDone: true },
-    run_analysis: {
-      recoverable: 0,
-      recoverableSafe: 0,
-      spaceItems: 0,
-      organizationItems: 0,
-      protectedItems: 0,
-      projects: 14,
-      warnings: [],
-      collectors: [],
-    },
+    last_analysis: null,
+    analyze: typicalAnalysis(),
   },
 } satisfies Record<string, CoreResponses>;

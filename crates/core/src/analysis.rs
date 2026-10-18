@@ -3,11 +3,12 @@
 
 use crate::activity::{ActivityRules, ProjectState, associate, last_activity, state};
 use crate::config::Config;
+use crate::config::Protections;
 use crate::engine::{AnalysisInputs, AnalysisResult, Engine, EventFn};
 use crate::item::{Item, Resource};
 use crate::message::Message;
 use crate::ports::{Clock, CommandRunner};
-use crate::projects::{DiscoveryOptions, Project, discover};
+use crate::projects::{Discovery, DiscoveryOptions, Project, discover};
 use crate::protection::protection_for;
 use crate::ranking::{RankedItem, Ranking, rank};
 use crate::risk::assess;
@@ -39,8 +40,23 @@ pub struct Analyzer {
     pub commands: Arc<dyn CommandRunner>,
 }
 
+/// Ranked items of one collector that just finished (T-08.06), before the others.
+pub type PartialFn = Arc<dyn Fn(&str, Vec<RankedItem>) + Send + Sync>;
+
 impl Analyzer {
     pub fn analyze(&self, config: &Config, on_event: EventFn) -> AnalysisReport {
+        self.analyze_streaming(config, on_event, Arc::new(|_, _| {}))
+    }
+
+    /// Like `analyze`, and hands each collector's ranked items to `on_partial` as soon as
+    /// that collector finishes. Projects are read first, so partial items already carry
+    /// their project's activity.
+    pub fn analyze_streaming(
+        &self,
+        config: &Config,
+        on_event: EventFn,
+        on_partial: PartialFn,
+    ) -> AnalysisReport {
         let (roots, warnings) = available(&config.roots);
         let discovery = discover(
             &roots,
@@ -49,14 +65,6 @@ impl Analyzer {
                 max_depth: config.preferences.scan_depth,
                 ..DiscoveryOptions::default()
             },
-        );
-        let result = self.engine.analyze(
-            &AnalysisInputs {
-                roots,
-                clock: Arc::clone(&self.clock),
-                commands: Arc::clone(&self.commands),
-            },
-            on_event,
         );
 
         let now = self.clock.now();
@@ -77,34 +85,78 @@ impl Analyzer {
                 }
             })
             .collect();
-        let states: HashMap<String, ProjectState> = projects
-            .iter()
-            .map(|s| (path_key(&s.project.root), s.state))
-            .collect();
+        let ranker = Arc::new(Ranker {
+            states: projects
+                .iter()
+                .map(|s| (path_key(&s.project.root), s.state))
+                .collect(),
+            discovery,
+            exclusions: config.roots.exclusions.clone(),
+            protections: config.protections.clone(),
+        });
 
-        let entries = result
-            .items
-            .iter()
-            .filter(|item| !excluded(item, &config.roots.exclusions))
-            .map(|item| {
-                let project = item_path(item)
-                    .and_then(|path| associate(path, &discovery))
-                    .map(|p| p.root.clone());
-                let project_state = project
-                    .as_ref()
-                    .and_then(|root| states.get(&path_key(root)).copied());
-                let protection = protection_for(item, &config.protections);
-                let assessment = assess(item, protection.as_ref());
-                RankedItem::new(item.clone(), assessment, project, project_state)
-            })
-            .collect();
+        let partial_ranker = Arc::clone(&ranker);
+        let result = self.engine.analyze(
+            &AnalysisInputs {
+                roots,
+                clock: Arc::clone(&self.clock),
+                commands: Arc::clone(&self.commands),
+                on_items: Some(Arc::new(move |id, items| {
+                    on_partial(
+                        id,
+                        items
+                            .iter()
+                            .filter_map(|i| partial_ranker.entry(i))
+                            .collect(),
+                    );
+                })),
+            },
+            on_event,
+        );
 
         AnalysisReport {
-            ranking: rank(entries),
+            ranking: rank(
+                result
+                    .items
+                    .iter()
+                    .filter_map(|i| ranker.entry(i))
+                    .collect(),
+            ),
             result,
             projects,
             warnings,
         }
+    }
+}
+
+/// What it takes to place one item: its project, that project's activity, its protection.
+struct Ranker {
+    discovery: Discovery,
+    states: HashMap<String, ProjectState>,
+    exclusions: Vec<String>,
+    protections: Protections,
+}
+
+impl Ranker {
+    /// `None` for items under an excluded folder.
+    fn entry(&self, item: &Item) -> Option<RankedItem> {
+        if excluded(item, &self.exclusions) {
+            return None;
+        }
+        let project = item_path(item)
+            .and_then(|path| associate(path, &self.discovery))
+            .map(|p| p.root.clone());
+        let project_state = project
+            .as_ref()
+            .and_then(|root| self.states.get(&path_key(root)).copied());
+        let protection = protection_for(item, &self.protections);
+        let assessment = assess(item, protection.as_ref());
+        Some(RankedItem::new(
+            item.clone(),
+            assessment,
+            project,
+            project_state,
+        ))
     }
 }
 
@@ -144,6 +196,7 @@ mod tests {
     use crate::ports::SystemCommandRunner;
     use crate::risk::Destination;
     use limpador_testkit::{FakeMachine, ProjectSpec};
+    use std::sync::Mutex;
 
     /// Reports a `node_modules` item for every project folder found under the roots.
     struct NodeModulesCollector;
@@ -250,6 +303,45 @@ mod tests {
         ));
         assert_eq!(report.ranking.totals.recoverable, 2_000);
         assert_eq!(report.projects.len(), 2);
+    }
+
+    #[test]
+    fn partial_items_arrive_ranked_with_their_projects_activity() {
+        let machine = FakeMachine::new().unwrap();
+        machine
+            .project(&ProjectSpec::node("parado").inactive_days(90).with_git())
+            .unwrap();
+        machine
+            .project(&ProjectSpec::node("excluido").inactive_days(90).with_git())
+            .unwrap();
+        let mut config = config(&machine);
+        config.roots.exclusions = vec!["**/excluido".into()];
+
+        let partial = Arc::new(Mutex::new(vec![]));
+        let sink = Arc::clone(&partial);
+        let report = analyzer(&machine).analyze_streaming(
+            &config,
+            Arc::new(|_, _| {}),
+            Arc::new(move |id, items| sink.lock().unwrap().push((id.to_owned(), items))),
+        );
+
+        let partial = partial.lock().unwrap();
+        assert_eq!(partial.len(), 1);
+        let (id, items) = &partial[0];
+        assert_eq!(id, "deps");
+        assert_eq!(
+            items
+                .iter()
+                .map(|e| e.item.name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["parado"],
+            "excluded folders stay out of partial results too"
+        );
+        assert!(matches!(
+            items[0].project_state,
+            Some(ProjectState::Inactive { .. })
+        ));
+        assert_eq!(items[0], report.ranking.space[0]);
     }
 
     #[test]

@@ -14,7 +14,8 @@ describe("primeira execução (J1, T-02.01)", () => {
     await $("button=Continuar").click();
     await $("button=Concluir e analisar").click();
 
-    await expect($('[data-testid="projects"]')).toHaveText("3 projetos");
+    // The fake machine's projects have nothing to clean and it has no Docker or WSL.
     await expect($('[data-testid="recoverable"]')).toHaveText("0,0 MB");
+    await expect($(".all-clean")).toHaveText("Tudo limpo! Nada para liberar agora.");
   });
 });

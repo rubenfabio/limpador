@@ -64,6 +64,10 @@ fn command(program: &str, args: &[&str]) -> Command {
     for var in GIT_LOCATION_VARS {
         command.env_remove(var);
     }
+    if program == "wsl" {
+        // wsl.exe writes UTF-16 unless asked for UTF-8.
+        command.env("WSL_UTF8", "1");
+    }
     command
 }
 
@@ -121,6 +125,17 @@ mod tests {
             assert!(removed.iter().any(|r| r == var), "{var} is inherited");
         }
         assert_eq!(command.get_args().collect::<Vec<_>>(), vec!["status"]);
+    }
+
+    #[test]
+    fn wsl_is_asked_for_utf8_output() {
+        let utf8 = |program: &str| {
+            command(program, &[])
+                .get_envs()
+                .any(|(k, v)| k == "WSL_UTF8" && v == Some(std::ffi::OsStr::new("1")))
+        };
+        assert!(utf8("wsl"));
+        assert!(!utf8("git"));
     }
 
     #[test]

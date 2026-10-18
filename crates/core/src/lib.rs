@@ -6,7 +6,9 @@
 pub mod activity;
 pub mod analysis;
 pub mod collector;
+pub mod collectors;
 pub mod config;
+pub mod disks;
 pub mod engine;
 pub mod glob;
 pub mod item;
